@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chroma.Commander", "Chroma.Commander\Chroma.Commander.csproj", "{6730B5AB-1E55-4E07-B48B-AC58F1AACAB1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chroma.Commander.TestApp", "Chroma.Commander.TestApp\Chroma.Commander.TestApp.csproj", "{0AB3485F-7BDC-43A9-A629-7BB9F289E775}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6730B5AB-1E55-4E07-B48B-AC58F1AACAB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6730B5AB-1E55-4E07-B48B-AC58F1AACAB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6730B5AB-1E55-4E07-B48B-AC58F1AACAB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6730B5AB-1E55-4E07-B48B-AC58F1AACAB1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0AB3485F-7BDC-43A9-A629-7BB9F289E775}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0AB3485F-7BDC-43A9-A629-7BB9F289E775}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0AB3485F-7BDC-43A9-A629-7BB9F289E775}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0AB3485F-7BDC-43A9-A629-7BB9F289E775}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

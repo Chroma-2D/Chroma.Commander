@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Chroma" Version="0.41.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Resources\Px437_ToshibaSat_8x14.ttf" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Resources\PxPlus_ToshibaSat_8x14.ttf" />
+      <EmbeddedResource Include="Resources\PxPlus_ToshibaSat_8x14.ttf" />
+    </ItemGroup>
+
+</Project>
