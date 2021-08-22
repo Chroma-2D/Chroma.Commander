@@ -18,7 +18,7 @@ namespace Chroma.Commander.TestApp
         protected override void LoadContent()
         {
             _console = new InGameConsole(Window);
-            _texture = Content.Load<Texture>("G:\\Pictures\\Cyberpunk 2077\\photomode_14122020_204041.png");
+            _texture = Content.Load<Texture>("backdrop.jpg");
             _texture.VirtualResolution = Window.Size;
         }
 

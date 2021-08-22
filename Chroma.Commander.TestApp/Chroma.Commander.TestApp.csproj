@@ -6,11 +6,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Chroma" Version="0.41.0" />
+      <PackageReference Include="Chroma" Version="0.48.0" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Chroma.Commander\Chroma.Commander.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="Content\backdrop.jpg">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>
