@@ -59,11 +59,27 @@ namespace Chroma.Commander
 
             if (_showCursor)
             {
+                RenderSettings.ShapeBlendingEnabled = true;
+                
+                RenderSettings.SetShapeBlendingEquations(
+                    BlendingEquation.Subtract,
+                    BlendingEquation.Add
+                );
+                
+                RenderSettings.SetShapeBlendingFunctions(
+                    BlendingFunction.SourceColor,
+                    BlendingFunction.OneMinusDestinationColor,
+                    BlendingFunction.DestinationColor,
+                    BlendingFunction.DestinationAlpha
+                );
+                
                 context.Rectangle(
                     ShapeMode.Fill,
                     _position + new Vector2(_currentCol * 8, 0),
                     8, 16, Color.White
                 );
+                
+                RenderSettings.ResetShapeBlending();
             }
         }
 
