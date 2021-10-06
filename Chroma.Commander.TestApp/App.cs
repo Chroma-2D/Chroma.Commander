@@ -12,7 +12,7 @@ namespace Chroma.Commander.TestApp
         
         public App() : base(new(false, false))
         {
-            Window.GoWindowed(new(1024, 600));
+            Window.Mode.SetWindowed(1024, 600);
         }
 
         protected override void LoadContent()
