@@ -1,6 +1,6 @@
 namespace Chroma.Commander.Expressions.Syntax.AST
 {
-    internal abstract class ConstantNode<T> : AstNode
+    internal abstract class ConstantNode<T> : ExpressionNode
     {
         public T Value { get; }
 

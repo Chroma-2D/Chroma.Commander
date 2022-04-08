@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Numerics;
+using Chroma.Commander.Expressions;
 using Chroma.Diagnostics;
 using Chroma.Graphics;
 using Chroma.Input;
@@ -16,12 +17,24 @@ namespace Chroma.Commander.TestApp
             Window.Mode.SetWindowed(1024, 600);
         }
 
+        [ConsoleCommand("test_cmd")]
+        [ConsoleCommand("test_cmd2")]
+        [ConsoleCommand("test_cmd3")]
+        internal static void TestCommand(DebugConsole console, params ExpressionValue[] args)
+        {
+            foreach (var arg in args)
+            {
+                console.Print(arg.ToString());
+            }
+        }
+
         protected override void LoadContent()
         {
             _console = new DebugConsole(Window);
             _console.RawInputHandler = HandleConsoleInput;
             _texture = Content.Load<Texture>("backdrop.jpg");
             _texture.VirtualResolution = Window.Size;
+            _console.RegisterEntities();
         }
 
         private int HandleConsoleInput(ref string[] tokens)
