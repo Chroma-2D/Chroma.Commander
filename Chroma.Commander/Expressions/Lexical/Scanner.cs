@@ -194,6 +194,7 @@ namespace Chroma.Commander.Expressions.Lexical
                 _position++;
             }
 
+            _position++;
             return Token.CreateString(str);
         }
 

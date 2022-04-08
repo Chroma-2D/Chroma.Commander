@@ -31,8 +31,8 @@ namespace Chroma.Commander.Expressions.Lexical
             return (int)Type;
         }
 
-        public static readonly Token Empty = new(TokenType.Empty, null);
-        public static readonly Token EOF = new(TokenType.EOF, null);
+        public static readonly Token Empty = new(TokenType.Empty, "<EMPTY>");
+        public static readonly Token EOF = new(TokenType.EOF, "<EOF>");
         
         public static readonly Token Minus = new(TokenType.Minus, "-");
         public static readonly Token Plus = new(TokenType.Plus, "+");

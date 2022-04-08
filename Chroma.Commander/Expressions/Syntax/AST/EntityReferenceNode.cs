@@ -1,6 +1,6 @@
 namespace Chroma.Commander.Expressions.Syntax.AST
 {
-    internal class EntityReferenceNode : AstNode
+    internal class EntityReferenceNode : ExpressionNode
     {
         public string EntityName { get; }
 

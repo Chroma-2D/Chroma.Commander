@@ -1,6 +1,6 @@
 namespace Chroma.Commander.Expressions.Syntax.AST
 {
-    internal class BinOpNode : AstNode
+    internal class BinOpNode : ExpressionNode
     {
         public enum BinOp
         {
@@ -8,15 +8,14 @@ namespace Chroma.Commander.Expressions.Syntax.AST
             Add,
             Multiply,
             Divide,
-            Modulo,
-            Assign
+            Modulo
         }
         
-        public AstNode Left { get; }
-        public AstNode Right { get; }
+        public ExpressionNode Left { get; }
+        public ExpressionNode Right { get; }
         public BinOp Type { get; }
 
-        public BinOpNode(AstNode left, AstNode right, BinOp type)
+        public BinOpNode(ExpressionNode left, ExpressionNode right, BinOp type)
         {
             Left = left;
             Right = right;

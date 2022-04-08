@@ -1,6 +1,6 @@
 namespace Chroma.Commander.Expressions.Syntax.AST
 {
-    internal class UnOpNode : AstNode
+    internal class UnOpNode : ExpressionNode
     {
         public enum UnOp
         {
@@ -8,10 +8,10 @@ namespace Chroma.Commander.Expressions.Syntax.AST
             Minus
         }
         
-        public AstNode Right { get; }
+        public ExpressionNode Right { get; }
         public UnOp Type { get; }
 
-        public UnOpNode(AstNode right, UnOp type)
+        public UnOpNode(ExpressionNode right, UnOp type)
         {
             Right = right;
             Type = type;

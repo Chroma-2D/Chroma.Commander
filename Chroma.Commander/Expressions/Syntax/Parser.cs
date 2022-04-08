@@ -31,26 +31,39 @@ namespace Chroma.Commander.Expressions.Syntax
 
         public DirectiveNode Parse()
         {
-            var astNode = Expression();
+            if (_token.Type != TokenType.Identifier)
+            {
+                throw new ExpressionException($"Unexpected token '{_token.Value}'.");
+            }
+
+            AstNode astNode = EntityReference(_token.Value);
+
+            if (_token.Type == TokenType.Assign)
+            {
+                Match(TokenType.Assign);
+                var right = Expression();   
+                astNode = new AssignNode(astNode as EntityReferenceNode, right);
+            }
+            else
+            {
+                var args = new List<ExpressionNode>();
+                
+                while (_token.Type != TokenType.EOF)
+                    args.Add(Expression());
+
+                astNode = new InvocationNode(astNode as EntityReferenceNode, args);
+
+            }
 
             return new DirectiveNode(astNode);
         }
 
-        private AstNode Expression()
+        private ExpressionNode Expression()
         {
-            var node = Factor();
-
-            switch (_token.Type)
-            {
-                case TokenType.Assign:
-                    Match(TokenType.Assign);
-                    return new BinOpNode(node, Expression(), BinOpNode.BinOp.Assign);
-            }
-
-            return node;
+            return Factor();
         }
 
-        private AstNode Factor()
+        private ExpressionNode Factor()
         {
             var node = Term();
 
@@ -78,7 +91,7 @@ namespace Chroma.Commander.Expressions.Syntax
             return node;
         }
         
-        private AstNode Term()
+        private ExpressionNode Term()
         {
             var node = Terminal();
 
@@ -101,15 +114,14 @@ namespace Chroma.Commander.Expressions.Syntax
             return node;
         }
         
-        private AstNode Terminal()
+        private ExpressionNode Terminal()
         {
             var value = _token.Value;
             
             switch (_token.Type)
             {
                 case TokenType.Identifier:
-                    Match(TokenType.Identifier);
-                    return new EntityReferenceNode(value);
+                    return EntityReference(value);
                 
                 case TokenType.Number:
                     Match(TokenType.Number);
@@ -136,6 +148,12 @@ namespace Chroma.Commander.Expressions.Syntax
                 default:
                     throw new ExpressionException($"Unsupported terminal token '{_token.Value}'.");
             }
+        }
+
+        private EntityReferenceNode EntityReference(string identifier)
+        {
+            Match(TokenType.Identifier);
+            return new EntityReferenceNode(identifier);
         }
 
         private void Match(TokenType tokenType)
