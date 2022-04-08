@@ -1,8 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Text;
+using Chroma.Commander.Expressions.Lexical;
+using Chroma.Commander.Expressions.Syntax;
 using Chroma.Graphics;
 using Chroma.Graphics.TextRendering.TrueType;
 using Chroma.Input;
@@ -12,7 +17,7 @@ using Color = Chroma.Graphics.Color;
 
 namespace Chroma.Commander
 {
-    public class InGameConsole : DisposableResource
+    public class DebugConsole : DisposableResource
     {
         private enum State
         {
@@ -37,8 +42,9 @@ namespace Chroma.Commander
 
         public float SlidingSpeed { get; set; } = 2000;
         public KeyCode ToggleKey { get; set; } = KeyCode.Grave;
+        public ConsoleInputHandler RawInputHandler { get; set; }
 
-        public InGameConsole(Window window, int maxLines = 20)
+        public DebugConsole(Window window, int maxLines = 20)
         {
             _window = window;
             _maxLines = maxLines;
@@ -57,12 +63,52 @@ namespace Chroma.Commander
                 _target.Width / 8,
                 HandleUserInput
             );
-
-            for (var i = 0; i < 50000; i++)
-            {
-                _scrollBuffer.Push(i.ToString("D5") + ": " + Path.GetRandomFileName());
-            }
         }
+
+        public void Print(string value)
+            => PushToOutputBuffer(value);
+
+        public void Print(object value)
+            => Print(value.ToString());
+        
+        public void Print(bool value)
+            => Print(value.ToString());
+
+        public void Print(sbyte value)
+            => Print(value.ToString());
+
+        public void Print(byte value)
+            => Print(value.ToString());
+        
+        public void Print(short value)
+            => Print(value.ToString());
+        
+        public void Print(ushort value)
+            => Print(value.ToString());
+
+        public void Print(int value)
+            => Print(value.ToString());
+        
+        public void Print(uint value)
+            => Print(value.ToString());
+
+        public void Print(long value)
+            => Print(value.ToString());
+
+        public void Print(ulong value)
+            => Print(value.ToString());
+
+        public void Print(float value)
+            => Print(value, CultureInfo.InvariantCulture);
+        
+        public void Print(float value, IFormatProvider provider)
+            => Print(value.ToString(provider));
+
+        public void Print(double value)
+            => Print(value.ToString(CultureInfo.InvariantCulture));
+        
+        public void Print(double value, IFormatProvider provider)
+            => Print(value.ToString(provider));
 
         public void Draw(RenderContext context)
         {
@@ -103,7 +149,7 @@ namespace Chroma.Commander
         }
 
         public void Update(float delta)
-        {
+        {           
             if (_state == State.SlidingDown)
             {
                 if (_offset.Y == 0)
@@ -135,7 +181,7 @@ namespace Chroma.Commander
 
             if (_state == State.Hidden)
                 return;
-
+            
             _scrollBufferWindow = _scrollBuffer.GetWindow();
             _inputLine.Update(delta);
         }
@@ -154,7 +200,7 @@ namespace Chroma.Commander
                 }
             }
 
-            if (_state != State.Visible)
+            if (_state == State.Hidden || _state == State.SlidingUp)
                 return;
 
             _inputLine.KeyPressed(e);
@@ -162,7 +208,10 @@ namespace Chroma.Commander
 
         public void TextInput(TextInputEventArgs e)
         {
-            if (_state != State.Visible)
+            if (_state == State.Hidden || _state == State.SlidingUp)
+                return;
+
+            if (Keyboard.IsKeyDown(ToggleKey))
                 return;
 
             _inputLine.TextInput(e);
@@ -194,9 +243,42 @@ namespace Chroma.Commander
 
         private void HandleUserInput(string input)
         {
+            Print(input);
+
+            try
+            {
+                var tokens = Tokenizer.Tokenize(input);
+                
+                if (RawInputHandler?.Invoke(ref tokens) < 0)
+                    return;
+
+                var parser = new Parser(input);
+                var directive = parser.Parse();
+                
+                var tokensWithoutTrigger = tokens.Skip(1).ToArray();
+            }
+            catch (FormatException e)
+            {
+                Print($"Bad input format: {e.Message}");
+            }
+            catch (Exception e)
+            {
+                Print($"Unhandled exception: {e.Message}");
+                Print(e.StackTrace);
+            }
+        }
+
+        private void PushToOutputBuffer(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+            {
+                _scrollBuffer.Push(string.Empty);
+                return;
+            }
+            
             var sb = new StringBuilder();
             var strings = new List<string>();
-                    
+
             for (var i = 0; i < input.Length; i++)
             {
                 sb.Append(input[i]);

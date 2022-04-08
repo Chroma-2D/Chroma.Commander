@@ -54,7 +54,7 @@ namespace Chroma.Commander
                 _ttf,
                 _inputVisual,
                 _position,
-                Color.White
+                ColorScheme.Text
             );
 
             if (_showCursor)

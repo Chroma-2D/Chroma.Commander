@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Globalization;
+using System.Numerics;
 using Chroma.Diagnostics;
 using Chroma.Graphics;
 using Chroma.Input;
@@ -7,7 +8,7 @@ namespace Chroma.Commander.TestApp
 {
     public class App : Game
     {
-        private InGameConsole _console;
+        private DebugConsole _console;
         private Texture _texture;
         
         public App() : base(new(false, false))
@@ -17,9 +18,15 @@ namespace Chroma.Commander.TestApp
 
         protected override void LoadContent()
         {
-            _console = new InGameConsole(Window);
+            _console = new DebugConsole(Window);
+            _console.RawInputHandler = HandleConsoleInput;
             _texture = Content.Load<Texture>("backdrop.jpg");
             _texture.VirtualResolution = Window.Size;
+        }
+
+        private int HandleConsoleInput(ref string[] tokens)
+        {
+            return 0;
         }
 
         protected override void Draw(RenderContext context)
@@ -35,7 +42,7 @@ namespace Chroma.Commander.TestApp
 
         protected override void Update(float delta)
         {
-            Window.Title = PerformanceCounter.FPS.ToString();
+            Window.Title = PerformanceCounter.FPS.ToString(CultureInfo.InvariantCulture);
             _console.Update(delta);
         }
 
