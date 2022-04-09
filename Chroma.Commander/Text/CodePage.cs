@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Chroma.Commander
+namespace Chroma.Commander.Text
 {
     internal static class CodePage
     {

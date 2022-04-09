@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Chroma.Commander
+namespace Chroma.Commander.Text
 {
     internal class ScrollBuffer
     {

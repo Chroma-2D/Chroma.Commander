@@ -5,7 +5,8 @@ namespace Chroma.Commander.Expressions.Syntax.AST
         public enum UnOp
         {
             Plus,
-            Minus
+            Minus,
+            Negate
         }
         
         public ExpressionNode Right { get; }

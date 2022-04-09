@@ -40,6 +40,8 @@ namespace Chroma.Commander.Expressions.Lexical
         public static readonly Token Divide = new(TokenType.Divide, "/");
         public static readonly Token Modulo = new(TokenType.Modulo, "%");
         public static readonly Token Assign = new(TokenType.Assign, "=");
+        public static readonly Token ConVarReference = new(TokenType.ConVarReference, "$");
+        public static readonly Token Toggle = new(TokenType.Toggle, "!");
         public static readonly Token LeftParenthesis = new(TokenType.LeftParenthesis, "(");
         public static readonly Token RightParenthesis = new(TokenType.RightParenthesis, ")");
 
@@ -51,6 +53,11 @@ namespace Chroma.Commander.Expressions.Lexical
         public static Token CreateNumber(string value)
         {
             return new Token(TokenType.Number, value);
+        }
+
+        public static Token CreateBoolean(string value)
+        {
+            return new Token(TokenType.Boolean, value);
         }
 
         public static Token CreateString(string value)

@@ -27,7 +27,7 @@ namespace Chroma.Commander.Expressions.Lexical
             }
             else if (IsValidIdentifierCharacter(CurrentCharacter))
             {
-                return Identifier();
+                return IdentifierOrKeyword();
             }
             else if (CurrentCharacter == '"')
             {
@@ -60,36 +60,51 @@ namespace Chroma.Commander.Expressions.Lexical
                     case '=':
                         _position++;
                         return Token.Assign;
-                    
+
                     case '(':
                         _position++;
                         return Token.LeftParenthesis;
-                    
+
                     case ')':
                         _position++;
                         return Token.RightParenthesis;
+                    
+                    case '$':
+                        _position++;
+                        return Token.ConVarReference;
+                    
+                    case '!':
+                        _position++;
+                        return Token.Toggle;
                     
                     case '\0':
                         return Token.EOF;
                 }
             }
 
-            _position++;
             throw new ExpressionException($"Unknown token '{CurrentCharacter}'.");
         }
 
-        private Token Identifier()
+        private Token IdentifierOrKeyword()
         {
             var sb = new StringBuilder();
 
             sb.Append(CurrentCharacter);
             _position++;
-            
+
             while (IsValidIdentifierCharacter(CurrentCharacter) ||
                    char.IsDigit(CurrentCharacter))
             {
                 sb.Append(CurrentCharacter);
                 _position++;
+            }
+
+            var value = sb.ToString();
+            switch (value)
+            {
+                case "true":
+                case "false":
+                    return Token.CreateBoolean(value);
             }
             
             return Token.CreateIdentifier(sb.ToString());
@@ -145,7 +160,7 @@ namespace Chroma.Commander.Expressions.Lexical
 
             return (char)int.Parse(sb.ToString(), NumberStyles.HexNumber);
         }
-        
+
         private Token String()
         {
             var str = string.Empty;
