@@ -7,6 +7,7 @@ namespace Chroma.Commander.Expressions
         public enum Type
         {
             Number,
+            Boolean,
             String
         }
 
@@ -16,11 +17,13 @@ namespace Chroma.Commander.Expressions
         
         public double Number { get; }
         public string String { get; }
+        public bool Boolean { get; }
 
         public ExpressionValue(double value)
         {
             Number = value;
             String = null;
+            Boolean = false;
             
             ValueType = Type.Number;
         }
@@ -29,15 +32,27 @@ namespace Chroma.Commander.Expressions
         {
             Number = 0;
             String = value;
+            Boolean = false;
 
             ValueType = Type.String;
+        }
+
+        public ExpressionValue(bool value)
+        {
+            Number = 0;
+            String = null;
+            Boolean = value;
+
+            ValueType = Type.Boolean;
         }
 
         public override string ToString()
         {
             if (ValueType == Type.Number)
                 return Number.ToString(CultureInfo.InvariantCulture);
-
+            else if (ValueType == Type.Boolean)
+                return Boolean.ToString();
+            
             return String;
         }
     }

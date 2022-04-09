@@ -14,6 +14,9 @@ namespace Chroma.Commander.Expressions.Lexical
         Identifier,
         Number,
         String,
+        Boolean,
+        ConVarReference,
+        Toggle,
         LeftParenthesis,
         RightParenthesis
     }

@@ -16,4 +16,22 @@
       <EmbeddedResource Include="Resources\PxPlus_ToshibaSat_8x14.ttf" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Update="DebugConsole.ExpressionEvaluation.cs">
+        <DependentUpon>DebugConsole.cs</DependentUpon>
+      </Compile>
+      <Compile Update="DebugConsole.Output.cs">
+        <DependentUpon>DebugConsole.cs</DependentUpon>
+      </Compile>
+      <Compile Update="ConsoleVariable.Field.cs">
+        <DependentUpon>ConsoleVariable.cs</DependentUpon>
+      </Compile>
+      <Compile Update="ConsoleVariable.Property.cs">
+        <DependentUpon>ConsoleVariable.cs</DependentUpon>
+      </Compile>
+      <Compile Update="DebugConsole.EntityRegistration.cs">
+        <DependentUpon>DebugConsole.cs</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
 </Project>
