@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Numerics;
 using System.Reflection;
-using Chroma.Commander.Environment;
 using Chroma.Commander.Expressions;
 using Chroma.Commander.Expressions.Syntax;
 using Chroma.Commander.Text;
@@ -23,7 +22,7 @@ namespace Chroma.Commander
             Hidden,
             Visible
         }
-
+        
         private Window _window;
         private RenderTarget _target;
         private Vector2 _offset;
@@ -42,7 +41,6 @@ namespace Chroma.Commander
 
         public float SlidingSpeed { get; set; } = 2000;
         public KeyCode ToggleKey { get; set; } = KeyCode.Grave;
-        public ConsoleInputHandler RawInputHandler { get; set; }
 
         public DebugConsole(Window window, int maxLines = 20)
         {
@@ -231,11 +229,11 @@ namespace Chroma.Commander
             }
             catch (FormatException e)
             {
-                Print($"Bad input format: {e.Message}");
+                Print(e.Message);
             }
             catch (ExpressionException e)
             {
-                Print($"Expression evaluation error: {e.Message}");
+                Print(e.Message);
             }
             catch (EntityNotFoundException e)
             {
@@ -251,12 +249,11 @@ namespace Chroma.Commander
             }
             catch (ConVarTypeMismatchException e)
             {
-                Print($"{e.Message}: cannot assign a '{e.ValueType}' to a '{e.ConVarType}'.");
+                Print(e.Message);
             }
-            catch (Exception e)
+            catch (ConVarOutOfRangeException e)
             {
-                Print($"Unhandled exception: {e.Message}");
-                Print(e.StackTrace);
+                Print(e.Message);
             }
         }
 

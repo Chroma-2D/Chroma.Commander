@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Text;
 using Chroma.Commander.Expressions;
@@ -22,7 +21,7 @@ namespace Chroma.Commander
             {
                 var cv = _conVarRegistry.GetConVar(crn.Identifier);
 
-                if (cv.RepresentsEnum)
+                if (cv.IsEnum)
                 {
                     var sb = new StringBuilder();
                     sb.Append(cv.GetNumber());
@@ -173,7 +172,7 @@ namespace Chroma.Commander
                 return new(conVar.GetString());
             }
 
-            throw new ExpressionException($"Unexpected console variable type '{conVar.Type}'.");
+            throw new ExpressionException($"Unexpected ConVar type '{conVar.Type}'.");
         }
         
         private void Visit(InvocationNode inv)
@@ -218,7 +217,7 @@ namespace Chroma.Commander
 
             if (cv.Type != ExpressionValue.Type.Boolean)
             {
-                throw new ExpressionException($"Unable to toggle a value of type '{cv.Type}'");
+                throw new ExpressionException($"Unable to toggle a {cv.Type.ToString().ToLower()}.");
             }
 
             cv.Set(!cv.GetBoolean());

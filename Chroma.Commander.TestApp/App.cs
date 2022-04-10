@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using System.Numerics;
+﻿using System.Numerics;
 using Chroma.Commander.Environment;
 using Chroma.Commander.Expressions;
 using Chroma.Diagnostics;
@@ -14,10 +13,10 @@ namespace Chroma.Commander.TestApp
         private Texture _texture;
 
         [ConsoleVariable("gfx_timestep")]
-        private double TimeStep
+        private int TimeStep
         {
             get => FixedTimeStepTarget;
-            set => FixedTimeStepTarget = (int)value;
+            set => FixedTimeStepTarget = value;
         }
 
         [ConsoleVariable("gfx_limit")]
@@ -33,6 +32,12 @@ namespace Chroma.Commander.TestApp
             get => Graphics.VerticalSyncMode;
             set => Graphics.VerticalSyncMode = value;
         }
+
+        [ConsoleVariable("cl_showfps")]
+        private byte ShowFpsMode { get; set; }
+
+        [ConsoleVariable("app_wintitle")]
+        private string _winTitle;
 
         public App() : base(new(false, false))
         {
@@ -53,16 +58,10 @@ namespace Chroma.Commander.TestApp
         protected override void LoadContent()
         {
             _console = new DebugConsole(Window);
-            _console.RawInputHandler = HandleConsoleInput;
             _texture = Content.Load<Texture>("backdrop.jpg");
             _texture.VirtualResolution = Window.Size;
             _console.RegisterStaticEntities();
             _console.RegisterInstanceEntities(this);
-        }
-
-        private int HandleConsoleInput(ref string[] tokens)
-        {
-            return 0;
         }
 
         protected override void Draw(RenderContext context)
@@ -79,7 +78,7 @@ namespace Chroma.Commander.TestApp
         protected override void Update(float delta)
         {
             Window.Title = $"{PerformanceCounter.FPS:F3} FPS";
-            
+
             _console.Update(delta);
         }
 
