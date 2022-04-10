@@ -5,7 +5,7 @@ namespace Chroma.Commander
     public class ConVarWriteException : Exception
     {
         public ConVarWriteException() 
-            : base("Console variable is read-only.")
+            : base("ConVar is read-only.")
         {
         }
     }

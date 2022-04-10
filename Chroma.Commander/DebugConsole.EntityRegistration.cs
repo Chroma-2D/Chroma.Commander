@@ -6,7 +6,6 @@ namespace Chroma.Commander
 {
     public partial class DebugConsole
     {
-        
         private void RegisterCommands(Type type)
         {
             foreach (var method in type.GetMethods(
@@ -22,7 +21,8 @@ namespace Chroma.Commander
                     if (cmdDelegate == null)
                     {
                         throw new InvalidOperationException(
-                            $"Attempt to register a method with invalid signature as '{trigger}'.");
+                            $"Attempt to register a method with invalid signature as '{trigger}'."
+                        );
                     }
 
                     _commandRegistry.Register(trigger, cmdDelegate);
@@ -56,11 +56,11 @@ namespace Chroma.Commander
                 }
             }
         }
-        
+
         private void RegisterInstanceConVars(object owner)
         {
             var type = owner.GetType();
-            
+
             foreach (var field in type.GetFields(
                          BindingFlags.Instance
                          | BindingFlags.Public
@@ -69,7 +69,7 @@ namespace Chroma.Commander
                 foreach (var attr in field.GetCustomAttributes<ConsoleVariableAttribute>())
                 {
                     var name = attr.Name;
-                    _conVarRegistry.RegisterConVar(name, field);
+                    _conVarRegistry.RegisterConVar(name, field, owner);
                 }
             }
 

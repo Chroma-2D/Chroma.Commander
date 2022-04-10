@@ -1,167 +1,167 @@
 using System;
-using System.Collections.Generic;
 using System.Globalization;
+using System.Reflection;
 using Chroma.Commander.Expressions;
+using Chroma.Commander.Extensions;
 
 namespace Chroma.Commander
 {
-    internal partial class ConsoleVariable
+    internal class ConsoleVariable
     {
-        private static HashSet<Type> _supportedTypes = new()
-        {
-            typeof(bool),
-            typeof(string),
-            typeof(double)
-        };
-        
         private object _owner;
+        private MemberInfo _member;
 
         public ExpressionValue.Type Type
+            => _member.GetCorrespondingExpressionType();
+
+        public bool IsWritable { get; }
+        public bool IsReadable { get; }
+        public bool IsEnum { get; }
+
+        public ConsoleVariable(FieldInfo field, object owner = null)
         {
-            get
+            if (field == null)
             {
-                if (_fieldInfo != null)
-                    return GetFieldExpressionType();
-                else if (_propertyInfo != null)
-                    return GetPropertyExpressionType();
-                
-                throw new InvalidOperationException("Console variable is in an invalid state.");
+                throw new ArgumentNullException(nameof(field));
             }
+
+            EnsureSupportedType(field);
+            
+            IsWritable = !field.IsInitOnly;
+            IsReadable = true;
+            IsEnum = field.FieldType.IsEnum;
+
+            _member = field;
+            _owner = owner;
         }
 
-        public bool RepresentsEnum
+        public ConsoleVariable(PropertyInfo property, object owner = null)
         {
-            get
+            if (property == null)
             {
-                if (_fieldInfo != null)
-                    return _fieldInfo.FieldType.IsEnum;
-                else if (_propertyInfo != null)
-                    return _propertyInfo.PropertyType.IsEnum;
-                
-                throw new InvalidOperationException("Console variable is in an invalid state.");
+                throw new ArgumentNullException(nameof(property));
             }
+
+            EnsureSupportedType(property);
+            
+            IsWritable = property.CanWrite;
+            IsReadable = property.CanRead;
+            IsEnum = property.PropertyType.IsEnum;
+
+            _member = property;
+            _owner = owner;
         }
 
         public double GetNumber()
         {
-            if (_fieldInfo != null)
-            {
-                return GetField<double>();
-            }
-            else if (_propertyInfo != null)
-            {
-                if (!_propertyInfo.CanRead)
-                    throw new ConVarReadException();
-                
-                return GetProperty<double>();
-            }
-            else
-            {
-                throw new InvalidOperationException("Console variable is in an invalid state.");
-            }
+            if (!IsReadable)
+                throw new ConVarReadException();
+
+            return _member.GetValue<double>(_owner);
         }
-        
+
         public string GetString()
         {
-            if (_fieldInfo != null)
-            {
-                return GetField<string>();
-            }
-            else if (_propertyInfo != null)
-            {
-                if (!_propertyInfo.CanRead)
-                    throw new ConVarReadException();
-                
-                return GetProperty<string>();
-            }
-            else
-            {
-                throw new InvalidOperationException("Console variable is in an invalid state.");
-            }
+            if (!IsReadable)
+                throw new ConVarReadException();
+
+            return _member.GetValue<string>(_owner);
         }
-        
+
         public bool GetBoolean()
         {
-            if (_fieldInfo != null)
-            {
-                return GetField<bool>();
-            }
-            else if (_propertyInfo != null)
-            {
-                if (!_propertyInfo.CanRead)
-                    throw new ConVarReadException();
-                
-                return GetProperty<bool>();
-            }
-            else
-            {
-                throw new InvalidOperationException("Console variable is in an invalid state.");
-            }
+            if (!IsReadable)
+                throw new ConVarReadException();
+
+            return _member.GetValue<bool>(_owner);
         }
 
         public void Set(bool value)
         {
-            if (_fieldInfo != null)
-            {
-                if (_fieldInfo.IsInitOnly)
-                    throw new ConVarWriteException();
+            if (!IsWritable)
+                throw new ConVarWriteException();
 
-                SetField(value);
-            }
-            else if (_propertyInfo != null)
+            if (_member.IsBoolean())
             {
-                if (!_propertyInfo.CanWrite)
-                    throw new ConVarWriteException();
-                
-                SetProperty(value);
+                _member.SetValue(_owner, value);
             }
             else
             {
-                throw new InvalidOperationException("Console variable is in an invalid state.");
+                throw new ConVarTypeMismatchException(
+                    Type,
+                    ExpressionValue.Type.Boolean
+                );
             }
         }
 
         public void Set(string value)
         {
-            if (_fieldInfo != null)
-            {
-                if (_fieldInfo.IsInitOnly)
-                    throw new ConVarWriteException();
+            if (!IsWritable)
+                throw new ConVarWriteException();
 
-                SetField(value);
+            if (_member.IsString())
+            {
+                _member.SetValue(_owner, value);
             }
-            else if (_propertyInfo != null)
+            else if (_member.IsEnum(out var enumType))
             {
-                if (!_propertyInfo.CanWrite)
-                    throw new ConVarWriteException();
-
-                SetProperty(value);
+                if (Enum.TryParse(enumType, value, out var enumValue))
+                {
+                    _member.SetValue(_owner, enumValue);
+                }
+                else
+                {
+                    throw new ConVarConversionException(
+                        typeof(string),
+                        enumType
+                    );
+                }
             }
             else
             {
-                throw new InvalidOperationException("Console variable is in an invalid state.");
+                throw new ConVarTypeMismatchException(
+                    Type,
+                    ExpressionValue.Type.String
+                );
             }
         }
 
         public void Set(double value)
         {
-            if (_fieldInfo != null)
-            {
-                if (_fieldInfo.IsInitOnly)
-                    throw new ConVarWriteException();
+            if (!IsWritable)
+                throw new ConVarWriteException();
 
-                SetField(value);
+            if (_member.IsNumerical(out var numericalMemberType))
+            {
+                try
+                {
+                    _member.SetValue(
+                        _owner,
+                        Convert.ChangeType(value, numericalMemberType)
+                    );
+                }
+                catch (OverflowException)
+                {
+                    throw new ConVarOutOfRangeException(
+                        $"'{value}' was too large for the backing type of this variable."
+                    );
+                }
             }
-            else if (_propertyInfo != null)
+            else if (_member.IsEnum(out var enumMemberType))
             {
-                if (!_propertyInfo.CanWrite)
-                    throw new ConVarWriteException();
+                var enumValue = Convert.ChangeType(
+                    value,
+                    enumMemberType.GetEnumUnderlyingType()
+                );
 
-                SetProperty(value);
+                _member.SetValue(_owner, enumValue);
             }
             else
             {
-                throw new InvalidOperationException("Console variable is in an invalid state.");
+                throw new ConVarTypeMismatchException(
+                    Type,
+                    ExpressionValue.Type.Number
+                );
             }
         }
 
@@ -171,9 +171,29 @@ namespace Chroma.Commander
             {
                 ExpressionValue.Type.Boolean => GetBoolean().ToString().ToLower(),
                 ExpressionValue.Type.Number => GetNumber().ToString(CultureInfo.InvariantCulture),
-                ExpressionValue.Type.String => GetString(),
-                _ => throw new InvalidOperationException("Console variable is in an invalid state.")
+                ExpressionValue.Type.String => "\"" + GetString() + "\"",
+                _ => throw new InvalidOperationException("Unexpected underlying type.")
             };
+        }
+
+        private void EnsureSupportedType(FieldInfo field)
+        {
+            if (!field.FieldType.IsValidConVarType())
+            {
+                throw new Exception(
+                    $"Field type {field.FieldType.FullName} is not a supported convar type."
+                );
+            }
+        }
+
+        private void EnsureSupportedType(PropertyInfo property)
+        {
+            if (!property.PropertyType.IsValidConVarType())
+            {
+                throw new Exception(
+                    $"Property type {property.PropertyType.FullName} is not a supported convar type."
+                );
+            }
         }
     }
 }
