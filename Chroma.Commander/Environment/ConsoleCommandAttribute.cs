@@ -6,6 +6,7 @@ namespace Chroma.Commander.Environment
     public class ConsoleCommandAttribute : Attribute
     {
         public string Trigger { get; }
+        public string Description { get; set; } = "description not available";
 
         public ConsoleCommandAttribute(string trigger)
         {

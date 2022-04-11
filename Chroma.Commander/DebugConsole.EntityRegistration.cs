@@ -6,27 +6,27 @@ namespace Chroma.Commander
 {
     public partial class DebugConsole
     {
-        private void RegisterCommands(Type type)
+        private void RegisterStaticCommands(Type type)
         {
             foreach (var method in type.GetMethods(
                          BindingFlags.Static
                          | BindingFlags.Public
                          | BindingFlags.NonPublic))
             {
-                foreach (var attr in method.GetCustomAttributes<ConsoleCommandAttribute>())
-                {
-                    var trigger = attr.Trigger;
-                    var cmdDelegate = method.CreateDelegate<ConsoleCommand>();
+                RegisterMethod(method, null);
+            }
+        }
+        
+        private void RegisterInstanceCommands(object owner)
+        {
+            var type = owner.GetType();
 
-                    if (cmdDelegate == null)
-                    {
-                        throw new InvalidOperationException(
-                            $"Attempt to register a method with invalid signature as '{trigger}'."
-                        );
-                    }
-
-                    _commandRegistry.Register(trigger, cmdDelegate);
-                }
+            foreach (var method in type.GetMethods(
+                         BindingFlags.Instance
+                         | BindingFlags.Public
+                         | BindingFlags.NonPublic))
+            {
+                RegisterMethod(method, owner);
             }
         }
 
@@ -37,11 +37,7 @@ namespace Chroma.Commander
                          | BindingFlags.Public
                          | BindingFlags.NonPublic))
             {
-                foreach (var attr in field.GetCustomAttributes<ConsoleVariableAttribute>())
-                {
-                    var name = attr.Name;
-                    _conVarRegistry.RegisterConVar(name, field);
-                }
+                RegisterField(field, null);
             }
 
             foreach (var prop in type.GetProperties(
@@ -49,11 +45,7 @@ namespace Chroma.Commander
                          | BindingFlags.Public
                          | BindingFlags.NonPublic))
             {
-                foreach (var attr in prop.GetCustomAttributes<ConsoleVariableAttribute>())
-                {
-                    var name = attr.Name;
-                    _conVarRegistry.RegisterConVar(name, prop);
-                }
+                RegisterProperty(prop, null);
             }
         }
 
@@ -66,11 +58,7 @@ namespace Chroma.Commander
                          | BindingFlags.Public
                          | BindingFlags.NonPublic))
             {
-                foreach (var attr in field.GetCustomAttributes<ConsoleVariableAttribute>())
-                {
-                    var name = attr.Name;
-                    _conVarRegistry.RegisterConVar(name, field, owner);
-                }
+                RegisterField(field, owner);
             }
 
             foreach (var prop in type.GetProperties(
@@ -78,11 +66,52 @@ namespace Chroma.Commander
                          | BindingFlags.Public
                          | BindingFlags.NonPublic))
             {
-                foreach (var attr in prop.GetCustomAttributes<ConsoleVariableAttribute>())
+                RegisterProperty(prop, owner);
+            }
+        }
+        
+        private void RegisterMethod(MethodInfo method, object owner)
+        {
+            foreach (var attr in method.GetCustomAttributes<ConsoleCommandAttribute>())
+            {
+                var trigger = attr.Trigger;
+                var desc = attr.Description;
+                var cmdDelegate = method.CreateDelegate<ConsoleCommandTarget>();
+
+                if (cmdDelegate == null)
                 {
-                    var name = attr.Name;
-                    _conVarRegistry.RegisterConVar(name, prop, owner);
+                    throw new InvalidOperationException(
+                        $"Attempt to register a method with invalid signature as '{trigger}'."
+                    );
                 }
+
+                _commandRegistry.Register(trigger, new ConsoleCommand(cmdDelegate, owner) { Description = desc });
+            }
+        }
+
+        private void RegisterProperty(PropertyInfo property, object owner)
+        {
+            foreach (var attr in property.GetCustomAttributes<ConsoleVariableAttribute>())
+            {
+                _conVarRegistry.RegisterConVar(
+                    attr.Name,
+                    property, 
+                    attr.Description,
+                    owner
+                );
+            }
+        }
+
+        private void RegisterField(FieldInfo field, object owner)
+        {
+            foreach (var attr in field.GetCustomAttributes<ConsoleVariableAttribute>())
+            {
+                _conVarRegistry.RegisterConVar(
+                    attr.Name, 
+                    field,
+                    attr.Description,
+                    owner
+                );
             }
         }
     }

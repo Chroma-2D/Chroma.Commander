@@ -22,29 +22,31 @@ namespace Chroma.Commander
             Hidden,
             Visible
         }
-        
+
         private Window _window;
         private RenderTarget _target;
         private Vector2 _offset;
         private TrueTypeFont _ttf;
-        private int _maxLines;
 
         private ScrollBuffer _scrollBuffer;
         private List<string> _scrollBufferWindow;
 
+        private InputHistory _inputHistory;
         private InputLine _inputLine;
         private State _state = State.Hidden;
 
         private ConsoleCommandRegistry _commandRegistry;
         private ConsoleVariableRegistry _conVarRegistry;
 
-        public float SlidingSpeed { get; set; } = 2000;
+        public float SlidingSpeed { get; set; } = 2750;
         public KeyCode ToggleKey { get; set; } = KeyCode.Grave;
+
+        public List<ConsoleVariableInfo> Variables => _conVarRegistry.RetrieveConVarList();
+        public List<ConsoleCommandInfo> Commands => _commandRegistry.RetrieveCommandInfoList();
 
         public DebugConsole(Window window, int maxLines = 20)
         {
             _window = window;
-            _maxLines = maxLines;
 
             LoadFont();
             _target = new RenderTarget(
@@ -54,6 +56,8 @@ namespace Chroma.Commander
 
             _offset.Y = -_target.Height;
             _scrollBuffer = new ScrollBuffer(maxLines);
+
+            _inputHistory = new InputHistory();
             _inputLine = new InputLine(
                 new(0, maxLines * _ttf.Height),
                 _ttf,
@@ -71,13 +75,14 @@ namespace Chroma.Commander
 
             foreach (var type in asm.GetTypes())
             {
-                RegisterCommands(type);
+                RegisterStaticCommands(type);
                 RegisterStaticConVars(type);
             }
         }
 
         public void RegisterInstanceEntities(object owner)
         {
+            RegisterInstanceCommands(owner);
             RegisterInstanceConVars(owner);
         }
 
@@ -89,7 +94,7 @@ namespace Chroma.Commander
             context.RenderTo(_target, () =>
             {
                 DrawBackdrop(context);
-                
+
                 for (var i = 0; i < _scrollBufferWindow.Count; i++)
                 {
                     context.DrawString(
@@ -174,7 +179,29 @@ namespace Chroma.Commander
             if (_state == State.Hidden || _state == State.SlidingUp)
                 return;
 
-            _inputLine.KeyPressed(e);
+            if (e.KeyCode == KeyCode.Up)
+            {
+                _inputHistory.Previous();                
+                _inputLine.Set(_inputHistory.CurrentEntry);
+            }
+            else if (e.KeyCode == KeyCode.Down)
+            {
+                var wasAtEnd = _inputHistory.IsAtEnd;
+                _inputHistory.Next();
+
+                if (wasAtEnd && _inputHistory.IsAtEnd)
+                {
+                    _inputLine.Clear();
+                }
+                else
+                {
+                    _inputLine.Set(_inputHistory.CurrentEntry);
+                }
+            }
+            else
+            {
+                _inputLine.KeyPressed(e);
+            }
         }
 
         public void TextInput(TextInputEventArgs e)
@@ -215,8 +242,8 @@ namespace Chroma.Commander
                 .GetManifestResourceStream("Chroma.Commander.Resources.PxPlus_ToshibaSat_8x14.ttf");
 
             _ttf = new TrueTypeFont(
-                stream, 
-                16, 
+                stream,
+                16,
                 string.Join("", CodePage.BuildCodePage437Plus())
             );
         }
@@ -225,9 +252,10 @@ namespace Chroma.Commander
         {
             if (string.IsNullOrWhiteSpace(input))
                 return;
-            
+
+            _inputHistory.AddToHistory(input);
             _scrollBuffer.ScrollToEnd();
-            
+
             Print(input);
 
             try
@@ -270,7 +298,8 @@ namespace Chroma.Commander
             }
             catch (ConVarConversionException e)
             {
-                Print($"Unable to convert the {e.SourceType.ToString().ToLower()} '{e.Value}' to .NET type {e.TargetType.FullName}.");
+                Print(
+                    $"Unable to convert the {e.SourceType.ToString().ToLower()} '{e.Value}' to .NET type {e.TargetType.FullName}.");
             }
         }
 
