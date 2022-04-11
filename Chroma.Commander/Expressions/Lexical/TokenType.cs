@@ -16,6 +16,7 @@ namespace Chroma.Commander.Expressions.Lexical
         String,
         Boolean,
         ConVarReference,
+        TypeQuery,
         Toggle,
         LeftParenthesis,
         RightParenthesis

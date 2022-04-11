@@ -72,6 +72,22 @@ namespace Chroma.Commander.Extensions
             );
         }
 
+        public static Type GetClrType(this MemberInfo mi)
+        {
+            if (mi is FieldInfo fi)
+            {
+                return fi.FieldType;
+            }
+            else if (mi is PropertyInfo pi)
+            {
+                return pi.PropertyType;
+            }
+            
+            throw new NotSupportedException(
+                $"{mi.MemberType} '{mi.Name}' is not a supported member type."
+            );
+        }
+        
         public static T GetValue<T>(this MemberInfo mi, object owner)
         {
             if (mi is FieldInfo fi)

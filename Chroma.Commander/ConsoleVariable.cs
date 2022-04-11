@@ -11,6 +11,8 @@ namespace Chroma.Commander
         private object _owner;
         private MemberInfo _member;
 
+        internal string ClrTypeFullName => _member.GetClrType().FullName;
+        
         public ExpressionValue.Type Type
             => _member.GetCorrespondingExpressionType();
 
@@ -112,7 +114,8 @@ namespace Chroma.Commander
                 else
                 {
                     throw new ConVarConversionException(
-                        typeof(string),
+                        value,
+                        ExpressionValue.Type.String,
                         enumType
                     );
                 }
@@ -181,7 +184,7 @@ namespace Chroma.Commander
             if (!field.FieldType.IsValidConVarType())
             {
                 throw new Exception(
-                    $"Field type {field.FieldType.FullName} is not a supported convar type."
+                    $"Field type {field.FieldType.FullName} is not a supported variable type."
                 );
             }
         }
@@ -191,7 +194,7 @@ namespace Chroma.Commander
             if (!property.PropertyType.IsValidConVarType())
             {
                 throw new Exception(
-                    $"Property type {property.PropertyType.FullName} is not a supported convar type."
+                    $"Property type {property.PropertyType.FullName} is not a supported variable type."
                 );
             }
         }

@@ -33,7 +33,6 @@ namespace Chroma.Commander
         private List<string> _scrollBufferWindow;
 
         private InputLine _inputLine;
-
         private State _state = State.Hidden;
 
         private ConsoleCommandRegistry _commandRegistry;
@@ -89,8 +88,8 @@ namespace Chroma.Commander
 
             context.RenderTo(_target, () =>
             {
-                context.Clear(ColorScheme.Background);
-
+                DrawBackdrop(context);
+                
                 for (var i = 0; i < _scrollBufferWindow.Count; i++)
                 {
                     context.DrawString(
@@ -204,17 +203,31 @@ namespace Chroma.Commander
             }
         }
 
+        protected virtual void DrawBackdrop(RenderContext context)
+        {
+            context.Clear(ColorScheme.Background);
+        }
+
         private void LoadFont()
         {
             using var stream = Assembly
                 .GetExecutingAssembly()
                 .GetManifestResourceStream("Chroma.Commander.Resources.PxPlus_ToshibaSat_8x14.ttf");
 
-            _ttf = new TrueTypeFont(stream, 16, string.Join("", CodePage.BuildCodePage437Plus()));
+            _ttf = new TrueTypeFont(
+                stream, 
+                16, 
+                string.Join("", CodePage.BuildCodePage437Plus())
+            );
         }
 
         private void HandleUserInput(string input)
         {
+            if (string.IsNullOrWhiteSpace(input))
+                return;
+            
+            _scrollBuffer.ScrollToEnd();
+            
             Print(input);
 
             try
@@ -254,6 +267,10 @@ namespace Chroma.Commander
             catch (ConVarOutOfRangeException e)
             {
                 Print(e.Message);
+            }
+            catch (ConVarConversionException e)
+            {
+                Print($"Unable to convert the {e.SourceType.ToString().ToLower()} '{e.Value}' to .NET type {e.TargetType.FullName}.");
             }
         }
 

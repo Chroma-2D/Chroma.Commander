@@ -9,7 +9,7 @@ namespace Chroma.Commander
         public ExpressionValue.Type ValueType { get; }
 
         public ConVarTypeMismatchException(ExpressionValue.Type conVarType, ExpressionValue.Type valueType)
-            : base($"Cannot assign a {valueType.ToString().ToLower()} to a {conVarType.ToString().ToLower()}")
+            : base($"Cannot assign a {valueType.ToString().ToLower()} to a {conVarType.ToString().ToLower()}.")
         {
             ConVarType = conVarType;
             ValueType = valueType;
