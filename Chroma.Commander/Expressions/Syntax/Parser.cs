@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Reflection.PortableExecutable;
 using Chroma.Commander.Expressions.Lexical;
 using Chroma.Commander.Expressions.Syntax.AST;
 
@@ -39,43 +37,46 @@ namespace Chroma.Commander.Expressions.Syntax
                 throw new ExpressionException("Unexpected EOF.");
             }
 
-            while (_token.Type != TokenType.EOF)
+            if (_token.Type == TokenType.ConVarReference)
             {
-                if (_token.Type == TokenType.ConVarReference)
-                {
-                    astNode = ConVarReference();
+                astNode = ConVarReference();
 
-                    if (_token.Type == TokenType.Assign)
-                    {
-                        Match(TokenType.Assign);
-                        var right = Expression();
-                        astNode = new AssignNode(astNode as ConVarReferenceNode, right);
-                    }
-                }
-                else if (_token.Type == TokenType.Identifier)
+                if (_token.Type == TokenType.Assign)
                 {
-                    var identifier = _token.Value;
-                    Match(TokenType.Identifier);
-
-                    var args = new List<ExpressionNode>();
-
-                    while (_token.Type != TokenType.EOF)
-                        args.Add(Expression());
-
-                    astNode = new InvocationNode(identifier, args);
-                }
-                else if (_token.Type == TokenType.Toggle)
-                {
-                    Match(TokenType.Toggle);
-                    var conVarRef = ConVarReference();
-                    astNode = new ToggleNode(conVarRef);
-                }
-                else
-                {
-                    throw new ExpressionException($"Unexpected token '{_token.Value}'.");
+                    Match(TokenType.Assign);
+                    var right = Expression();
+                    astNode = new AssignNode(astNode as ConVarReferenceNode, right);
                 }
             }
+            else if (_token.Type == TokenType.TypeQuery)
+            {
+                Match(TokenType.TypeQuery);
+                astNode = new TypeQueryNode(ConVarReference());
+            }
+            else if (_token.Type == TokenType.Identifier)
+            {
+                var identifier = _token.Value;
+                Match(TokenType.Identifier);
 
+                var args = new List<ExpressionNode>();
+
+                while (_token.Type != TokenType.EOF)
+                    args.Add(Expression());
+
+                astNode = new InvocationNode(identifier, args);
+            }
+            else if (_token.Type == TokenType.Toggle)
+            {
+                Match(TokenType.Toggle);
+                var conVarRef = ConVarReference();
+                astNode = new ToggleNode(conVarRef);
+            }
+            else
+            {
+                throw new ExpressionException($"Unexpected {_token.FriendlyRepresentation}.");
+            }
+
+            Match(TokenType.EOF);
             return new DirectiveNode(astNode);
         }
 
@@ -144,12 +145,6 @@ namespace Chroma.Commander.Expressions.Syntax
                 case TokenType.ConVarReference:
                     return ConVarReference();
 
-                case TokenType.Identifier:
-                    var identifier = _token.Value;
-                    Match(TokenType.Identifier);
-
-                    return new StringNode(identifier);
-
                 case TokenType.Number:
                     Match(TokenType.Number);
                     return new NumberNode(double.Parse(value));
@@ -175,9 +170,20 @@ namespace Chroma.Commander.Expressions.Syntax
                     var node = Expression();
                     Match(TokenType.RightParenthesis);
                     return node;
-
+                
                 default:
-                    throw new ExpressionException($"Unsupported terminal token '{_token.Value}'.");
+                {
+                    var msg = $"Unexpected {Token.GetTypeString(_token.Type)}";
+
+                    if (_token.Type == TokenType.Identifier)
+                    {
+                        msg += $" '{_token.Value}'";
+                    }
+                    
+                    throw new ExpressionException(
+                        $"{msg}."
+                    );
+                }
             }
         }
 
@@ -194,10 +200,27 @@ namespace Chroma.Commander.Expressions.Syntax
         {
             if (_token.Type != tokenType)
             {
-                throw new ExpressionException($"Unexpected token '{_token.Value}'.");
+                throw new ExpressionException(
+                    $"Expected {WithParticle(Token.GetTypeString(tokenType))}, found " +
+                    $"{WithParticle(Token.GetTypeString(_token.Type))}."
+                );
             }
 
             _token = _scanner.Next();
+        }
+
+        private string WithParticle(string str, bool capitalize = false)
+        {
+            var vowels = "aeiou";
+            var an = capitalize ? "An" : "an";
+            var a = capitalize ? "A" : "a";
+
+            if (!char.IsLetter(str[0]))
+                return str;
+
+            return vowels.Contains(str[0])
+                ? $"{an} {str}"
+                : $"{a} {str}";
         }
     }
 }

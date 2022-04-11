@@ -40,6 +40,10 @@ namespace Chroma.Commander
             {
                 Visit(tg);
             }
+            else if (dir.Child is TypeQueryNode tq)
+            {
+                Visit(tq);
+            }
             else
             {
                 throw new ExpressionException($"Unsupported node type {dir.GetType()}.");
@@ -152,11 +156,6 @@ namespace Chroma.Commander
 
         private ExpressionValue Visit(ConVarReferenceNode entRef)
         {
-            if (!_conVarRegistry.Exists(entRef.Identifier))
-            {
-                throw new EntityNotFoundException(entRef.Identifier, $"ConVar '{entRef.Identifier}' not found.");
-            }
-
             var conVar = _conVarRegistry.GetConVar(entRef.Identifier);
 
             if (conVar.Type == ExpressionValue.Type.Boolean)
@@ -172,7 +171,7 @@ namespace Chroma.Commander
                 return new(conVar.GetString());
             }
 
-            throw new ExpressionException($"Unexpected ConVar type '{conVar.Type}'.");
+            throw new ExpressionException($"Unexpected variable type '{conVar.Type}'.");
         }
         
         private void Visit(InvocationNode inv)
@@ -221,6 +220,31 @@ namespace Chroma.Commander
             }
 
             cv.Set(!cv.GetBoolean());
+        }
+
+        private void Visit(TypeQueryNode tq)
+        {
+            var sb = new StringBuilder();
+            var cv = _conVarRegistry.GetConVar(tq.ConVarReference.Identifier);
+            
+            sb.Append(cv.Type.ToString().ToLower());
+            sb.Append(" | ");
+
+            if (cv.IsReadable)
+                sb.Append("R");
+            else sb.Append("-");
+
+            if (cv.IsWritable)
+                sb.Append("W");
+            else sb.Append("-");
+
+            if (cv.IsEnum)
+            {
+                sb.Append(" | ");
+                sb.Append(cv.ClrTypeFullName);
+            }
+            
+            Print(sb.ToString());
         }
         
         private ExpressionValue Visit(StringNode str)

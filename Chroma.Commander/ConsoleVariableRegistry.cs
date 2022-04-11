@@ -29,26 +29,11 @@ namespace Chroma.Commander
             _conVars.Add(name, new(property, owner));
         }
 
-        public void SetConVarValue(string name, bool value)
-        {
-            _conVars[name].Set(value);
-        }
-        
-        public void SetConVarValue(string name, double value)
-        {
-            _conVars[name].Set(value);
-        }
-        
-        public void SetConVarValue(string name, string value)
-        {
-            _conVars[name].Set(value);
-        }
-
         internal ConsoleVariable GetConVar(string name)
         {
             if (!_conVars.ContainsKey(name))
             {
-                throw new EntityNotFoundException(name, $"ConVar '{name}' not found.");
+                throw new EntityNotFoundException(name, $"Variable '{name}' not found.");
             }
             
             return _conVars[name];

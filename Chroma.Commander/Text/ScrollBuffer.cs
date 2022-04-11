@@ -41,7 +41,7 @@ namespace Chroma.Commander.Text
             if (_lines.Count - _window <= 0)
                 return;
             
-            _bottom = _lines.Count - _window - 1;
+            _bottom = _lines.Count - _window;
         }
 
         public List<string> GetWindow()

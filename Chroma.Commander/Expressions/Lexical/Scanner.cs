@@ -77,6 +77,10 @@ namespace Chroma.Commander.Expressions.Lexical
                         _position++;
                         return Token.Toggle;
                     
+                    case '?':
+                        _position++;
+                        return Token.TypeQuery;
+                    
                     case '\0':
                         return Token.EOF;
                 }
