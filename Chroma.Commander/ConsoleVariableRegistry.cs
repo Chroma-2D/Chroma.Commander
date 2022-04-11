@@ -13,20 +13,38 @@ namespace Chroma.Commander
             return _conVars.ContainsKey(name);
         }
 
-        public void RegisterConVar(string name, FieldInfo field, object owner = null)
+        public List<ConsoleVariableInfo> RetrieveConVarList()
         {
-            if (Exists(name))
-                throw new DuplicateConVarException(name);
+            var ret = new List<ConsoleVariableInfo>();
 
-            _conVars.Add(name, new(field, owner));
+            foreach (var cv in _conVars)
+            {
+                ret.Add(
+                    new ConsoleVariableInfo(
+                        cv.Key,
+                        cv.Value.Description,
+                        cv.Value.Type
+                    )
+                );
+            }
+
+            return ret;
         }
 
-        public void RegisterConVar(string name, PropertyInfo property, object owner = null)
+        public void RegisterConVar(string name, FieldInfo field, string description, object owner = null)
         {
             if (Exists(name))
                 throw new DuplicateConVarException(name);
 
-            _conVars.Add(name, new(property, owner));
+            _conVars.Add(name, new(field, owner) { Description = description });
+        }
+
+        public void RegisterConVar(string name, PropertyInfo property, string description, object owner = null)
+        {
+            if (Exists(name))
+                throw new DuplicateConVarException(name);
+
+            _conVars.Add(name, new(property, owner) { Description = description });
         }
 
         internal ConsoleVariable GetConVar(string name)
@@ -35,7 +53,7 @@ namespace Chroma.Commander
             {
                 throw new EntityNotFoundException(name, $"Variable '{name}' not found.");
             }
-            
+
             return _conVars[name];
         }
     }

@@ -33,6 +33,18 @@ namespace Chroma.Commander
             _maxCols = maxCols;
         }
 
+        public void Set(string input)
+        {
+            _input = input;
+            End();
+        }
+
+        public void Clear()
+        {
+            Home();
+            _input = string.Empty;
+        }
+        
         public void Update(float delta)
         {
             if (_blinkClock > 500)
@@ -60,25 +72,25 @@ namespace Chroma.Commander
             if (_showCursor)
             {
                 RenderSettings.ShapeBlendingEnabled = true;
-                
+
                 RenderSettings.SetShapeBlendingEquations(
                     BlendingEquation.Subtract,
                     BlendingEquation.Add
                 );
-                
+
                 RenderSettings.SetShapeBlendingFunctions(
                     BlendingFunction.SourceColor,
                     BlendingFunction.OneMinusDestinationColor,
                     BlendingFunction.DestinationColor,
                     BlendingFunction.DestinationAlpha
                 );
-                
+
                 context.Rectangle(
                     ShapeMode.Fill,
                     _position + new Vector2(_currentCol * 8, 0),
                     8, 16, Color.White
                 );
-                
+
                 RenderSettings.ResetShapeBlending();
             }
         }
@@ -101,6 +113,10 @@ namespace Chroma.Commander
         {
             switch (e.KeyCode)
             {
+                case KeyCode.Escape:
+                    Clear();
+                    break;
+                
                 case KeyCode.Return:
                 case KeyCode.NumEnter:
                 {
@@ -133,7 +149,7 @@ namespace Chroma.Commander
                     }
                     break;
                 }
-                
+
                 case KeyCode.Left:
                 {
                     if (_currentCol <= 0)
@@ -151,7 +167,7 @@ namespace Chroma.Commander
                     }
                     break;
                 }
-                
+
                 case KeyCode.Right:
                 {
                     if (_currentIndex >= _input.Length)
@@ -169,31 +185,19 @@ namespace Chroma.Commander
                     }
                     break;
                 }
-                
+
                 case KeyCode.End:
                 {
-                    _currentIndex = _input.Length;
-
-                    if (_input.Length >= _maxCols)
-                    {
-                        _currentCol = _maxCols - 1;
-                        _margin = _input.Length - _maxCols + 1;
-                    }
-                    else
-                    {
-                        _currentCol = _input.Length;
-                    }
+                    End();
                     break;
                 }
-                
+
                 case KeyCode.Home:
                 {
-                    _currentIndex = 0;
-                    _currentCol = 0;
-                    _margin = 0;
+                    Home();
                     break;
                 }
-                
+
                 case KeyCode.Delete:
                 {
                     if (_currentIndex >= _input.Length)
@@ -203,6 +207,28 @@ namespace Chroma.Commander
                     break;
                 }
             }
+        }
+
+        private void End()
+        {
+            _currentIndex = _input.Length;
+
+            if (_input.Length >= _maxCols)
+            {
+                _currentCol = _maxCols - 1;
+                _margin = _input.Length - _maxCols + 1;
+            }
+            else
+            {
+                _currentCol = _input.Length;
+            }
+        }
+
+        private void Home()
+        {
+            _currentIndex = 0;
+            _currentCol = 0;
+            _margin = 0;
         }
     }
 }

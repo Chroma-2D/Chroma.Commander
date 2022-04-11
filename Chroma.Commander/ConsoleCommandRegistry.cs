@@ -13,6 +13,23 @@ namespace Chroma.Commander
         {
             _console = console;
         }
+
+        public List<ConsoleCommandInfo> RetrieveCommandInfoList()
+        {
+            var ret = new List<ConsoleCommandInfo>();
+            
+            foreach (var cmd in _commands)
+            {
+                ret.Add(
+                    new ConsoleCommandInfo(
+                        cmd.Key, 
+                        cmd.Value.Description
+                    )
+                );
+            }
+
+            return ret;
+        }
         
         public void Register(string trigger, ConsoleCommand cmd)
         {
@@ -30,7 +47,7 @@ namespace Chroma.Commander
 
         public void Invoke(string trigger, params ExpressionValue[] args)
         {
-            _commands[trigger].Invoke(_console, args);
+            _commands[trigger].Execute(_console, args);
         }
     }
 }

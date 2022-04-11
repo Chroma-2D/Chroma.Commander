@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using Chroma.Commander.Environment;
 using Chroma.Commander.Expressions;
 using Chroma.Diagnostics;
@@ -12,31 +13,31 @@ namespace Chroma.Commander.TestApp
         private DebugConsole _console;
         private Texture _texture;
 
-        [ConsoleVariable("gfx_timestep")]
+        [ConsoleVariable("gfx_timestep", Description = "fixed time step target in frames per second")]
         private int TimeStep
         {
             get => FixedTimeStepTarget;
             set => FixedTimeStepTarget = value;
         }
 
-        [ConsoleVariable("gfx_limit")]
+        [ConsoleVariable("gfx_limit", Description = "whether or not framerate limiter is enabled")]
         private bool LimitFramerate
         {
             get => Graphics.LimitFramerate;
             set => Graphics.LimitFramerate = value;
         }
 
-        [ConsoleVariable("gfx_vsync")]
+        [ConsoleVariable("gfx_vsync", Description = "control vertical synchronization")]
         private VerticalSyncMode VSync
         {
             get => Graphics.VerticalSyncMode;
             set => Graphics.VerticalSyncMode = value;
         }
 
-        [ConsoleVariable("cl_showfps")]
-        private byte ShowFpsMode { get; set; }
+        [ConsoleVariable("cl_showfps", Description = "diagnostic purposes only, different modes of performance printout")]
+        private byte ShowFpsMode { get; }
 
-        [ConsoleVariable("app_wintitle")]
+        [ConsoleVariable("app_wintitle", Description = "global window title")]
         private string _winTitle;
 
         public App() : base(new(false, false))
@@ -44,14 +45,28 @@ namespace Chroma.Commander.TestApp
             Window.Mode.SetWindowed(1024, 600);
         }
 
-        [ConsoleCommand("test_cmd")]
-        [ConsoleCommand("test_cmd2")]
-        [ConsoleCommand("test_cmd3")]
+        [ConsoleCommand("test_cmd", Description = "it's a test command...")]
         internal static void TestCommand(DebugConsole console, params ExpressionValue[] args)
         {
             foreach (var arg in args)
             {
                 console.Print(arg.ToString());
+            }
+        }
+
+        [ConsoleCommand("help")]
+        private static void HelpCommand(DebugConsole console, params ExpressionValue[] args)
+        {
+            console.Print("--- COMMANDS ---");
+            foreach (var command in console.Commands)
+            {
+                console.Print($"{command.Trigger} - {command.Description}");
+            }
+            
+            console.Print("--- VARIABLES ---");
+            foreach (var variable in console.Variables)
+            {
+                console.Print($"{variable.Name} : {variable.Type} - {variable.Description}");
             }
         }
 

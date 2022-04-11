@@ -20,6 +20,8 @@ namespace Chroma.Commander
         public bool IsReadable { get; }
         public bool IsEnum { get; }
 
+        public string Description { get; init; }
+
         public ConsoleVariable(FieldInfo field, object owner = null)
         {
             if (field == null)
