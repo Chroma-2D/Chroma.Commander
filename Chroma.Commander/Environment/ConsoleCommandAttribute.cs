@@ -2,7 +2,7 @@
 
 namespace Chroma.Commander.Environment
 {
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
     public class ConsoleCommandAttribute : Attribute
     {
         public string Trigger { get; }
