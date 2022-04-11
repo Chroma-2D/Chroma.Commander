@@ -2,7 +2,7 @@
 
 namespace Chroma.Commander.Environment
 {
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = true, Inherited = false)]
     public class ConsoleVariableAttribute : Attribute
     {
         public string Name { get; }

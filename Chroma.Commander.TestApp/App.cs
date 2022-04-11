@@ -1,5 +1,4 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using Chroma.Commander.Environment;
 using Chroma.Commander.Expressions;
 using Chroma.Diagnostics;
