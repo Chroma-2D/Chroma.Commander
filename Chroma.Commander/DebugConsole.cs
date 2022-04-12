@@ -31,7 +31,6 @@ namespace Chroma.Commander
         private ScrollBuffer _scrollBuffer;
         private List<string> _scrollBufferWindow;
 
-        private InputHistory _inputHistory;
         private InputLine _inputLine;
         private State _state = State.Hidden;
 
@@ -57,7 +56,6 @@ namespace Chroma.Commander
             _offset.Y = -_target.Height;
             _scrollBuffer = new ScrollBuffer(maxLines);
 
-            _inputHistory = new InputHistory();
             _inputLine = new InputLine(
                 new(0, maxLines * _ttf.Height),
                 _ttf,
@@ -179,29 +177,8 @@ namespace Chroma.Commander
             if (_state == State.Hidden || _state == State.SlidingUp)
                 return;
 
-            if (e.KeyCode == KeyCode.Up)
-            {
-                _inputHistory.Previous();
-                _inputLine.Set(_inputHistory.CurrentEntry);
-            }
-            else if (e.KeyCode == KeyCode.Down)
-            {
-                var wasAtEnd = _inputHistory.IsAtEnd;
-                _inputHistory.Next();
 
-                if (wasAtEnd && _inputHistory.IsAtEnd)
-                {
-                    _inputLine.Clear();
-                }
-                else
-                {
-                    _inputLine.Set(_inputHistory.CurrentEntry);
-                }
-            }
-            else
-            {
-                _inputLine.KeyPressed(e);
-            }
+            _inputLine.KeyPressed(e);
         }
 
         public void TextInput(TextInputEventArgs e)
@@ -253,9 +230,7 @@ namespace Chroma.Commander
             if (string.IsNullOrWhiteSpace(input))
                 return;
 
-            _inputHistory.AddToHistory(input);
             _scrollBuffer.ScrollToEnd();
-
             Print(input);
 
             try

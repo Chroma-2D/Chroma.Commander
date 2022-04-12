@@ -24,6 +24,8 @@ namespace Chroma.Commander
         private int _blinkClock;
         private bool _showCursor;
 
+        private InputHistory _inputHistory;
+
         public InputLine(Vector2 position, TrueTypeFont ttf, int maxCols, Action<string> inputHandler)
         {
             _position = position;
@@ -31,6 +33,8 @@ namespace Chroma.Commander
 
             _inputHandler = inputHandler;
             _maxCols = maxCols;
+
+            _inputHistory = new InputHistory();
         }
 
         public void Set(string input)
@@ -44,7 +48,7 @@ namespace Chroma.Commander
             Home();
             _input = string.Empty;
         }
-        
+
         public void Update(float delta)
         {
             if (_blinkClock > 500)
@@ -107,6 +111,8 @@ namespace Chroma.Commander
             {
                 _currentCol++;
             }
+            
+            OnInputChangedByKeyboard();
         }
 
         public void KeyPressed(KeyEventArgs e)
@@ -115,11 +121,15 @@ namespace Chroma.Commander
             {
                 case KeyCode.Escape:
                     Clear();
+                    OnInputChangedByKeyboard();
                     break;
-                
+
                 case KeyCode.Return:
                 case KeyCode.NumEnter:
                 {
+                    _inputHistory.AddToHistory(_input);
+                    _inputHistory.ClearCache();
+                    
                     _inputHandler?.Invoke(_input);
                     _input = string.Empty;
 
@@ -147,6 +157,7 @@ namespace Chroma.Commander
                     {
                         _margin--;
                     }
+                    OnInputChangedByKeyboard();
                     break;
                 }
 
@@ -186,6 +197,28 @@ namespace Chroma.Commander
                     break;
                 }
 
+                case KeyCode.Up:
+                {
+                    _inputHistory.Previous();
+                    Set(_inputHistory.CurrentEntry);
+                    break;
+                }
+
+                case KeyCode.Down:
+                {
+                    _inputHistory.Next();
+
+                    if (string.IsNullOrEmpty(_inputHistory.CurrentEntry))
+                    {
+                        Set(_inputHistory.CachedInput);
+                    }
+                    else
+                    {
+                        Set(_inputHistory.CurrentEntry);
+                    }
+                    break;
+                }
+
                 case KeyCode.End:
                 {
                     End();
@@ -204,6 +237,7 @@ namespace Chroma.Commander
                         return;
 
                     _input = _input.Remove(_currentIndex, 1);
+                    OnInputChangedByKeyboard();
                     break;
                 }
             }
@@ -229,6 +263,11 @@ namespace Chroma.Commander
             _currentIndex = 0;
             _currentCol = 0;
             _margin = 0;
+        }
+
+        private void OnInputChangedByKeyboard()
+        {
+            _inputHistory.CacheInput(_input);
         }
     }
 }
