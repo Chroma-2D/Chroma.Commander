@@ -2,7 +2,7 @@ using System;
 
 namespace Chroma.Commander
 {
-    public class EntityNotFoundException : Exception
+    internal class EntityNotFoundException : Exception
     {
         public string Name { get; }
 

@@ -3,14 +3,15 @@ using Chroma.Commander.Expressions;
 
 namespace Chroma.Commander
 {
-    public class ConVarConversionException : Exception
+    internal class ConVarConversionException : Exception
     {
         public string Value { get; }
         public ExpressionValue.Type SourceType { get; }
         public Type TargetType { get; }
 
         public ConVarConversionException(string value, ExpressionValue.Type sourceType, Type targetType)
-            : base("Failed to convert source type to the target type.")
+            : base(
+                $"Unable to convert the {sourceType.ToString().ToLower()} '{value}' to .NET type {targetType.FullName}.")
         {
             Value = value;
             SourceType = sourceType;

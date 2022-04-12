@@ -296,10 +296,13 @@ namespace Chroma.Commander
             {
                 Print(e.Message);
             }
+            catch (ConVarMisuseException e)
+            {
+                Print(e.Message);
+            }
             catch (ConVarConversionException e)
             {
-                Print(
-                    $"Unable to convert the {e.SourceType.ToString().ToLower()} '{e.Value}' to .NET type {e.TargetType.FullName}.");
+                Print(e.Message);
             }
         }
 
