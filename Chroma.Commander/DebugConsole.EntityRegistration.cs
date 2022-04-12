@@ -78,14 +78,7 @@ namespace Chroma.Commander
                 var desc = attr.Description;
                 var defaultArgs = attr.DefaultArgumentValues;
 
-                var cmdDelegate = method.CreateDelegate<ConsoleCommandTarget>();
-
-                if (cmdDelegate == null)
-                {
-                    throw new InvalidOperationException(
-                        $"Attempt to register a method with invalid signature as '{trigger}'."
-                    );
-                }
+                var cmdDelegate = method.CreateDelegate<ConsoleCommandTarget>(owner);
 
                 _commandRegistry.Register(
                     trigger,

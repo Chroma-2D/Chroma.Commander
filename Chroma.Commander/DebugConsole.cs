@@ -181,7 +181,7 @@ namespace Chroma.Commander
 
             if (e.KeyCode == KeyCode.Up)
             {
-                _inputHistory.Previous();                
+                _inputHistory.Previous();
                 _inputLine.Set(_inputHistory.CurrentEntry);
             }
             else if (e.KeyCode == KeyCode.Down)
