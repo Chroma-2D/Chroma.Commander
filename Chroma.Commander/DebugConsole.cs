@@ -51,7 +51,7 @@ namespace Chroma.Commander
             LoadFont();
             _target = new RenderTarget(
                 window.Size.Width,
-                maxLines * _ttf.Height + 2 + _ttf.Height + 2
+                maxLines * _ttf!.Height + 2 + _ttf.Height + 2
             );
 
             _offset.Y = -_target.Height;

@@ -23,7 +23,8 @@ namespace Chroma.Commander
                 ret.Add(
                     new ConsoleCommandInfo(
                         cmd.Key, 
-                        cmd.Value.Description
+                        cmd.Value.Description,
+                        cmd.Value.DefaultArguments
                     )
                 );
             }

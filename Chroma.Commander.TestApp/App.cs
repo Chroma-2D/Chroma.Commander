@@ -1,4 +1,6 @@
-﻿using System.Numerics;
+﻿using System.Linq;
+using System.Numerics;
+using System.Text;
 using Chroma.Commander.Environment;
 using Chroma.Commander.Expressions;
 using Chroma.Diagnostics;
@@ -44,7 +46,10 @@ namespace Chroma.Commander.TestApp
             Window.Mode.SetWindowed(1024, 600);
         }
 
-        [ConsoleCommand("test_cmd", Description = "it's a test command...")]
+        [ConsoleCommand(
+            "test_cmd", 
+            DefaultArguments = new object[] { 20, "test", false }, 
+            Description = "it's a test command...")]
         internal static void TestCommand(DebugConsole console, params ExpressionValue[] args)
         {
             foreach (var arg in args)
@@ -59,7 +64,24 @@ namespace Chroma.Commander.TestApp
             console.Print("--- COMMANDS ---");
             foreach (var command in console.Commands)
             {
-                console.Print($"{command.Trigger} - {command.Description}");
+                var sb = new StringBuilder();
+                sb.Append(command.Trigger);
+                
+                if (command.DefaultArguments != null)
+                {
+                    sb.Append(" [");
+                    sb.Append(string.Join(
+                        ",", 
+                        command.DefaultArguments.Select(
+                            x => x.ToConsoleStringRepresentation()
+                        )
+                    ));
+                    sb.Append("]");
+                }
+
+                sb.Append(" - ");
+                sb.Append(command.Description);
+                console.Print(sb.ToString());
             }
             
             console.Print("--- VARIABLES ---");
