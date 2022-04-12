@@ -71,7 +71,7 @@ namespace Chroma.Commander.TestApp
                 {
                     sb.Append(" [");
                     sb.Append(string.Join(
-                        ",", 
+                        ' ', 
                         command.DefaultArguments.Select(
                             x => x.ToConsoleStringRepresentation()
                         )
@@ -89,6 +89,14 @@ namespace Chroma.Commander.TestApp
             {
                 console.Print($"{variable.Name} : {variable.Type} - {variable.Description}");
             }
+        }
+
+        [ConsoleCommand("test_instance",
+            Description = "test instance command or something",
+            DefaultArguments = new object[] { 666, true, "yes", VerticalSyncMode.Adaptive })]
+        private void InstanceCommand(DebugConsole console, params ExpressionValue[] args)
+        {
+            console.Print("Yay!");
         }
 
         protected override void LoadContent()

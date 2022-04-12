@@ -7,6 +7,7 @@ namespace Chroma.Commander
     {
         private int _historyIndex = -1;
         private List<string> _history = new();
+        public string CachedInput { get; private set; }
 
         public string CurrentEntry
         {
@@ -41,6 +42,17 @@ namespace Chroma.Commander
 
             _history.Add(input);
             End();
+        }
+
+        public void CacheInput(string input)
+        {
+            CachedInput = input;
+            End();
+        }
+
+        public void ClearCache()
+        {
+            CachedInput = string.Empty;
         }
 
         public void Next()
