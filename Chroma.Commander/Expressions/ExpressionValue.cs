@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 
 namespace Chroma.Commander.Expressions
@@ -46,14 +47,38 @@ namespace Chroma.Commander.Expressions
             ValueType = Type.Boolean;
         }
 
+        public string ToConsoleStringRepresentation()
+        {
+            switch (ValueType)
+            {
+                case Type.Boolean:
+                    return Boolean.ToString().ToLower();
+                
+                case Type.Number:
+                    return Number.ToString(CultureInfo.InvariantCulture).ToLower();
+                
+                case Type.String:
+                    return $"\"{String}\"";
+                
+                default: throw new InvalidOperationException("Invalid value type?");
+            }
+        }
+
         public override string ToString()
         {
-            if (ValueType == Type.Number)
-                return Number.ToString(CultureInfo.InvariantCulture);
-            else if (ValueType == Type.Boolean)
-                return Boolean.ToString();
-            
-            return String;
+            switch (ValueType)
+            {
+                case Type.Boolean:
+                    return Boolean.ToString();
+                
+                case Type.Number:
+                    return Number.ToString(CultureInfo.InvariantCulture);
+                
+                case Type.String:
+                    return String;
+                
+                default: throw new InvalidOperationException("Invalid value type?");
+            }
         }
     }
 }

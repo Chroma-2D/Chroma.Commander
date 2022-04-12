@@ -46,7 +46,12 @@ namespace Chroma.Commander
             => PushToOutputBuffer(value);
 
         public void Print(object value)
-            => Print(value.ToString());
+        {
+            Print(
+                value == null
+                ? "(null)"
+                : value.ToString());
+        }
 
         public void Print(bool value)
             => Print(value.ToString());

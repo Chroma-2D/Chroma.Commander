@@ -27,44 +27,55 @@ namespace Chroma.Commander.Extensions
                    || type == typeof(bool)
                    || type.IsEnum;
         }
-        
+
+        public static ExpressionValue.Type GetCorrespondingExpressionType(this Type type)
+        {
+            if (type == typeof(bool))
+            {
+                return ExpressionValue.Type.Boolean;
+            }
+            else if (type == typeof(string))
+            {
+                return ExpressionValue.Type.String;
+            }
+            else if (type.IsNumerical()
+                     || type.IsEnum)
+            {
+                return ExpressionValue.Type.Number;
+            }
+
+            throw new NotSupportedException($"Type '{type.FullName}' is not a supported expression value type.");
+        }
+
         public static ExpressionValue.Type GetCorrespondingExpressionType(this MemberInfo mi)
         {
             if (mi is FieldInfo fi)
             {
-                if (fi.FieldType == typeof(bool))
+                try
                 {
-                    return ExpressionValue.Type.Boolean;
+                    return GetCorrespondingExpressionType(fi.FieldType);
                 }
-                else if (fi.FieldType == typeof(string))
+                catch (Exception e)
                 {
-                    return ExpressionValue.Type.String;
+                    throw new NotSupportedException(
+                        $"Field '{fi.Name}' is of an unsupported type '{fi.FieldType.FullName}'.",
+                        e
+                    );
                 }
-                else if (fi.FieldType.IsNumerical()
-                         || fi.FieldType.IsEnum)
-                {
-                    return ExpressionValue.Type.Number;
-                }
-
-                ThrowUnsupportedFieldType(fi);
             }
             else if (mi is PropertyInfo pi)
             {
-                if (pi.PropertyType == typeof(bool))
+                try
                 {
-                    return ExpressionValue.Type.Boolean;
+                    return GetCorrespondingExpressionType(pi.PropertyType);
                 }
-                else if (pi.PropertyType == typeof(string))
+                catch (Exception e)
                 {
-                    return ExpressionValue.Type.String;
+                    throw new NotSupportedException(
+                        $"Property '{pi.Name}' is of an unsupported type '{pi.PropertyType.FullName}'.",
+                        e
+                    );
                 }
-                else if (pi.PropertyType.IsNumerical()
-                         || pi.PropertyType.IsEnum)
-                {
-                    return ExpressionValue.Type.Number;
-                }
-
-                ThrowUnsupportedPropertyType(pi);
             }
 
             throw new NotSupportedException(
@@ -82,12 +93,12 @@ namespace Chroma.Commander.Extensions
             {
                 return pi.PropertyType;
             }
-            
+
             throw new NotSupportedException(
                 $"{mi.MemberType} '{mi.Name}' is not a supported member type."
             );
         }
-        
+
         public static T GetValue<T>(this MemberInfo mi, object owner)
         {
             if (mi is FieldInfo fi)
@@ -147,7 +158,7 @@ namespace Chroma.Commander.Extensions
                 );
             }
         }
-        
+
         public static bool IsEnum(this MemberInfo mi, out Type type)
         {
             if (mi is FieldInfo fi)
@@ -167,7 +178,7 @@ namespace Chroma.Commander.Extensions
                 );
             }
         }
-        
+
         public static bool IsBoolean(this MemberInfo mi)
         {
             if (mi is FieldInfo fi)
@@ -185,7 +196,7 @@ namespace Chroma.Commander.Extensions
                 );
             }
         }
-        
+
         public static bool IsString(this MemberInfo mi)
         {
             if (mi is FieldInfo fi)
@@ -202,16 +213,6 @@ namespace Chroma.Commander.Extensions
                     $"{mi.MemberType} '{mi.Name}' is not a supported member type."
                 );
             }
-        }
-
-        private static void ThrowUnsupportedFieldType(FieldInfo fi)
-        {
-            throw new NotSupportedException($"Field '{fi.Name}' is of an unsupported type '{fi.FieldType.FullName}'.");
-        }
-
-        private static void ThrowUnsupportedPropertyType(PropertyInfo pi)
-        {
-            throw new NotSupportedException($"Property '{pi.Name}' is of an unsupported type '{pi.PropertyType.FullName}'.");
         }
     }
 }

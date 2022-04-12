@@ -16,7 +16,7 @@ namespace Chroma.Commander
                 RegisterMethod(method, null);
             }
         }
-        
+
         private void RegisterInstanceCommands(object owner)
         {
             var type = owner.GetType();
@@ -69,13 +69,15 @@ namespace Chroma.Commander
                 RegisterProperty(prop, owner);
             }
         }
-        
+
         private void RegisterMethod(MethodInfo method, object owner)
         {
             foreach (var attr in method.GetCustomAttributes<ConsoleCommandAttribute>())
             {
                 var trigger = attr.Trigger;
                 var desc = attr.Description;
+                var defaultArgs = attr.DefaultArgumentValues;
+
                 var cmdDelegate = method.CreateDelegate<ConsoleCommandTarget>();
 
                 if (cmdDelegate == null)
@@ -85,7 +87,14 @@ namespace Chroma.Commander
                     );
                 }
 
-                _commandRegistry.Register(trigger, new ConsoleCommand(cmdDelegate, owner) { Description = desc });
+                _commandRegistry.Register(
+                    trigger,
+                    new(cmdDelegate, owner)
+                    {
+                        Description = desc,
+                        DefaultArguments = defaultArgs
+                    }
+                );
             }
         }
 
@@ -95,7 +104,7 @@ namespace Chroma.Commander
             {
                 _conVarRegistry.RegisterConVar(
                     attr.Name,
-                    property, 
+                    property,
                     attr.Description,
                     owner
                 );
@@ -107,7 +116,7 @@ namespace Chroma.Commander
             foreach (var attr in field.GetCustomAttributes<ConsoleVariableAttribute>())
             {
                 _conVarRegistry.RegisterConVar(
-                    attr.Name, 
+                    attr.Name,
                     field,
                     attr.Description,
                     owner
