@@ -36,6 +36,9 @@ namespace Chroma.Commander
             if (input.StartsWith(' '))
                 return;
 
+            if (_history.Any() && _history.Last() == input)
+                return;
+
             _history.Add(input);
             End();
         }
@@ -47,8 +50,8 @@ namespace Chroma.Commander
 
             _historyIndex++;
 
-            if (_historyIndex >= _history.Count)
-                _historyIndex = _history.Count - 1;
+            if (_historyIndex > _history.Count)
+                _historyIndex = _history.Count;
         }
 
         public void Previous()
