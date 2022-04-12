@@ -12,37 +12,70 @@ namespace Chroma.Commander.Expressions
             String
         }
 
+        private double _number;
+        private string _string;
+        private bool _boolean;
+
         public static readonly ExpressionValue Zero = new(0);
         
         public Type ValueType { get; }
-        
-        public double Number { get; }
-        public string String { get; }
-        public bool Boolean { get; }
+
+        public double Number
+        {
+            get
+            {
+                if (ValueType != Type.Number)
+                    throw new ConVarMisuseException(ValueType, Type.Number);
+
+                return _number;
+            }
+        }
+
+        public string String
+        {
+            get
+            {
+                if (ValueType != Type.String)
+                    throw new ConVarMisuseException(ValueType, Type.String);
+
+                return _string;
+            }
+        }
+
+        public bool Boolean
+        {
+            get
+            {
+                if (ValueType != Type.Boolean)
+                    throw new ConVarMisuseException(ValueType, Type.Boolean);
+
+                return _boolean;
+            }
+        }
 
         public ExpressionValue(double value)
         {
-            Number = value;
-            String = null;
-            Boolean = false;
+            _number = value;
+            _string = null;
+            _boolean = false;
             
             ValueType = Type.Number;
         }
 
         public ExpressionValue(string value)
         {
-            Number = 0;
-            String = value;
-            Boolean = false;
+            _number = 0;
+            _string = value;
+            _boolean = false;
 
             ValueType = Type.String;
         }
 
         public ExpressionValue(bool value)
         {
-            Number = 0;
-            String = null;
-            Boolean = value;
+            _number = 0;
+            _string = null;
+            _boolean = value;
 
             ValueType = Type.Boolean;
         }
