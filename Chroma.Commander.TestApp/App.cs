@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using System.Numerics;
 using System.Text;
-using Chroma.Commander.Environment;
 using Chroma.Commander.Expressions;
 using Chroma.Diagnostics;
 using Chroma.Graphics;

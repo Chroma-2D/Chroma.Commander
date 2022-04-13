@@ -1,6 +1,5 @@
 using System;
 using System.Reflection;
-using Chroma.Commander.Environment;
 
 namespace Chroma.Commander
 {

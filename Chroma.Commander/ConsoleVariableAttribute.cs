@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Chroma.Commander.Environment
+namespace Chroma.Commander
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = true, Inherited = false)]
     public class ConsoleVariableAttribute : Attribute
