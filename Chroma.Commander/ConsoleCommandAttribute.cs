@@ -2,7 +2,7 @@
 using Chroma.Commander.Expressions;
 using Chroma.Commander.Extensions;
 
-namespace Chroma.Commander.Environment
+namespace Chroma.Commander
 {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
     public class ConsoleCommandAttribute : Attribute
