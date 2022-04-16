@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Numerics;
 using System.Text;
+using System.Threading;
 using Chroma.Commander.Expressions;
 using Chroma.Diagnostics;
 using Chroma.Graphics;
@@ -10,8 +11,9 @@ namespace Chroma.Commander.TestApp
 {
     public class App : Game
     {
-        private DebugConsole _console;
-        private Texture _texture;
+        private CustomBackgroundDebugConsole _console;
+        private Texture _appbackdrop;
+        private Texture _consolebg;
 
         [ConsoleVariable("gfx_timestep", Description = "fixed time step target in frames per second")]
         private int TimeStep
@@ -100,16 +102,18 @@ namespace Chroma.Commander.TestApp
 
         protected override void LoadContent()
         {
-            _console = new DebugConsole(Window);
-            _texture = Content.Load<Texture>("backdrop.jpg");
-            _texture.VirtualResolution = Window.Size;
+            _consolebg = Content.Load<Texture>("console_bg.jpg");
+            _console = new CustomBackgroundDebugConsole(Window, _consolebg);
+            
+            _appbackdrop = Content.Load<Texture>("backdrop.jpg");
+            _appbackdrop.VirtualResolution = Window.Size;
             _console.RegisterStaticEntities();
             _console.RegisterInstanceEntities(this);
         }
 
         protected override void Draw(RenderContext context)
         {
-            context.DrawTexture(_texture, Vector2.Zero, Vector2.One, Vector2.Zero, 0);
+            context.DrawTexture(_appbackdrop, Vector2.Zero, Vector2.One, Vector2.Zero, 0);
             _console.Draw(context);
         }
 

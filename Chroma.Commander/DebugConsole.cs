@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Numerics;
 using System.Reflection;
 using Chroma.Commander.Expressions;
@@ -10,6 +11,7 @@ using Chroma.Graphics.TextRendering.TrueType;
 using Chroma.Input;
 using Chroma.MemoryManagement;
 using Chroma.Windowing;
+using Color = Chroma.Graphics.Color;
 
 namespace Chroma.Commander
 {
@@ -29,7 +31,6 @@ namespace Chroma.Commander
         private TrueTypeFont _ttf;
 
         private ScrollBuffer _scrollBuffer;
-        private List<string> _scrollBufferWindow;
 
         private InputLine _inputLine;
         private State _state = State.Hidden;
@@ -37,27 +38,46 @@ namespace Chroma.Commander
         private ConsoleCommandRegistry _commandRegistry;
         private ConsoleVariableRegistry _conVarRegistry;
 
-        public float SlidingSpeed { get; set; } = 2750;
+        protected Size Dimensions { get; }
+        protected int BufferAreaHeight { get; }
+        protected int InputLineHeight { get; }
+        protected int BorderHeight { get; }
+
+        public float SlidingSpeed { get; set; } = 3000;
         public KeyCode ToggleKey { get; set; } = KeyCode.Grave;
 
         public List<ConsoleVariableInfo> Variables => _conVarRegistry.RetrieveConVarList();
         public List<ConsoleCommandInfo> Commands => _commandRegistry.RetrieveCommandInfoList();
+
+        public ConsoleTheme Theme { get; }
 
         public DebugConsole(Window window, int maxLines = 20)
         {
             _window = window;
 
             LoadFont();
-            _target = new RenderTarget(
+
+            InputLineHeight = _ttf.Height;
+            BufferAreaHeight = maxLines * _ttf.Height;
+            BorderHeight = 2;
+            
+            Dimensions = new(
                 window.Size.Width,
-                maxLines * _ttf!.Height + 2 + _ttf.Height + 2
+                BufferAreaHeight 
+                + InputLineHeight
+                + BorderHeight
             );
+
+            Theme = new ConsoleTheme();
+            
+            _target = new RenderTarget(Dimensions);
 
             _offset.Y = -_target.Height;
             _scrollBuffer = new ScrollBuffer(maxLines);
 
             _inputLine = new InputLine(
-                new(0, maxLines * _ttf.Height),
+                this,
+                new(0, BufferAreaHeight),
                 _ttf,
                 _target.Width / 8,
                 HandleUserInput
@@ -85,19 +105,21 @@ namespace Chroma.Commander
         }
 
         public void Draw(RenderContext context)
-        {
+        {           
             if (_state == State.Hidden)
                 return;
 
             context.RenderTo(_target, () =>
             {
+                context.Clear(Color.Transparent);
                 DrawBackdrop(context);
-
-                for (var i = 0; i < _scrollBufferWindow.Count; i++)
+                
+                var scrollBufferWindow = _scrollBuffer.GetWindow();
+                for (var i = 0; i < scrollBufferWindow.Count; i++)
                 {
                     context.DrawString(
                         _ttf,
-                        _scrollBufferWindow[i],
+                        scrollBufferWindow[i],
                         new(0, _ttf.Height * i),
                         Color.White
                     );
@@ -105,14 +127,14 @@ namespace Chroma.Commander
 
                 _inputLine.Draw(context);
 
-                RenderSettings.LineThickness = 2;
+                RenderSettings.LineThickness = BorderHeight;
                 context.Line(
-                    new(0, _target.Height - 1),
-                    new(_target.Width, _target.Height - 1),
-                    ColorScheme.Border
+                    new(0, _target.Height - BorderHeight / 2),
+                    new(_target.Width, _target.Height - BorderHeight / 2),
+                    Theme.BorderColor
                 );
             });
-
+            
             context.DrawTexture(
                 _target,
                 _offset,
@@ -156,7 +178,6 @@ namespace Chroma.Commander
             if (_state == State.Hidden)
                 return;
 
-            _scrollBufferWindow = _scrollBuffer.GetWindow();
             _inputLine.Update(delta);
         }
 
@@ -209,7 +230,7 @@ namespace Chroma.Commander
 
         protected virtual void DrawBackdrop(RenderContext context)
         {
-            context.Clear(ColorScheme.Background);
+            context.Clear(Theme.BackgroundColor);
         }
 
         private void LoadFont()

@@ -6,7 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Chroma" Version="0.54.1" />
+      <PackageReference Include="Chroma" Version="0.54.2" />
     </ItemGroup>
 
     <ItemGroup>
@@ -15,6 +15,9 @@
 
     <ItemGroup>
       <None Update="Content\backdrop.jpg">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Content\console_bg.jpg">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>

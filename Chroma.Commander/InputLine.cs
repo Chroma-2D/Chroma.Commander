@@ -8,6 +8,7 @@ namespace Chroma.Commander
 {
     internal class InputLine
     {
+        private DebugConsole _owner;
         private Vector2 _position;
         private TrueTypeFont _ttf;
         private Action<string> _inputHandler;
@@ -26,9 +27,10 @@ namespace Chroma.Commander
 
         private InputHistory _inputHistory;
 
-        public InputLine(Vector2 position, TrueTypeFont ttf, int maxCols, Action<string> inputHandler)
+        public InputLine(DebugConsole owner, Vector2 position, TrueTypeFont ttf, int maxCols, Action<string> inputHandler)
         {
-            _position = position;
+            _owner = owner;
+            _position = position + new Vector2(0, 1);
             _ttf = ttf;
 
             _inputHandler = inputHandler;
@@ -70,7 +72,7 @@ namespace Chroma.Commander
                 _ttf,
                 _inputVisual,
                 _position,
-                ColorScheme.Text
+                _owner.Theme.TextColor
             );
 
             if (_showCursor)

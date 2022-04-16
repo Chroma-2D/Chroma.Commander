@@ -8,25 +8,23 @@
         <Title>Chroma.Commander</Title>
         <Description>Simple, comfortable and powerful debugging console for games made using Chroma Framework.</Description>
 
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageId>Chroma.Commander</PackageId>
         <Version>1.0.0</Version>
-        <Author>Ciastex</Author>
+        <Authors>Ciastex</Authors>
         <RepositoryType>git</RepositoryType>
-        <RepositoryUrl>https://github.com/Chroma-2D/Chroma</RepositoryUrl>
+        <RepositoryUrl>https://github.com/Chroma-2D/Chroma.Commander</RepositoryUrl>
         <PackageIcon>nugeticon.png</PackageIcon>
         <PackageTags>chroma;2d;debugging-console;console;gamedev-tools;gamedev</PackageTags>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Chroma" Version="0.54.1" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Remove="Resources\Px437_ToshibaSat_8x14.ttf" />
-    </ItemGroup>
-
-    <ItemGroup>
       <EmbeddedResource Include="Resources\PxPlus_ToshibaSat_8x14.ttf" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="Resources\nugeticon.png" Pack="true" PackagePath="\nugeticon.png" />
     </ItemGroup>
 
     <ItemGroup>
@@ -39,5 +37,9 @@
       <Compile Update="DebugConsole.EntityRegistration.cs">
         <DependentUpon>DebugConsole.cs</DependentUpon>
       </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Chroma" Version="0.54.2" />
     </ItemGroup>
 </Project>
