@@ -117,7 +117,7 @@ namespace Chroma.Commander
 
                     if (right.Number == 0)
                     {
-                        throw new ExpressionException("Pamiętaj chemiku młody, nie dziel kurwo przez zero.");
+                        throw new ExpressionException("Attempt to divide by zero.");
                     }
 
                     return new(left.Number % right.Number);
@@ -133,7 +133,7 @@ namespace Chroma.Commander
 
                     if (right.Number == 0)
                     {
-                        throw new ExpressionException("Pamiętaj chemiku młody, nie dziel kurwo przez zero.");
+                        throw new ExpressionException("Attempt to divide by zero.");
                     }
 
                     return new(left.Number / right.Number);
