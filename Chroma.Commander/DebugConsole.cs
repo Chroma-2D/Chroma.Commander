@@ -50,6 +50,9 @@ namespace Chroma.Commander
         public List<ConsoleCommandInfo> Commands => _commandRegistry.RetrieveCommandInfoList();
 
         public ConsoleTheme Theme { get; }
+        
+        public bool IsOpen => _state is not State.Hidden;
+        public bool IsTransitioning => _state is State.SlidingDown or State.SlidingDown;
 
         public DebugConsole(Window window, int maxLines = 20)
         {
@@ -61,12 +64,9 @@ namespace Chroma.Commander
             BufferAreaHeight = maxLines * _ttf.Height;
             BorderHeight = 2;
             
-            Dimensions = new(
-                window.Size.Width,
-                BufferAreaHeight 
-                + InputLineHeight
-                + BorderHeight
-            );
+            Dimensions = window.Size with { Height = BufferAreaHeight 
+                                                     + InputLineHeight
+                                                     + BorderHeight };
 
             Theme = new ConsoleTheme();
             
@@ -89,8 +89,13 @@ namespace Chroma.Commander
 
         public void RegisterStaticEntities()
         {
-            var asm = Assembly.GetCallingAssembly();
+            RegisterStaticEntities(
+                Assembly.GetCallingAssembly()
+            );
+        }
 
+        public void RegisterStaticEntities(Assembly asm)
+        {
             foreach (var type in asm.GetTypes())
             {
                 RegisterStaticCommands(type);
