@@ -21,6 +21,7 @@ namespace Chroma.Commander
                 ret.Add(
                     new ConsoleVariableInfo(
                         cv.Key,
+                        cv.Value.ManagedMemberName,
                         cv.Value.Description,
                         cv.Value.Type
                     )

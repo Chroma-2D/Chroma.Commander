@@ -90,7 +90,7 @@ namespace Chroma.Commander.TestApp
             console.Print("--- VARIABLES ---");
             foreach (var variable in console.Variables)
             {
-                console.Print($"{variable.Name} : {variable.Type} - {variable.Description}");
+                console.Print($"{variable.ConVarName} : {variable.Type} - {variable.Description}");
             }
         }
 

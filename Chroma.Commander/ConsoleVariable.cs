@@ -16,6 +16,7 @@ namespace Chroma.Commander
         public ExpressionValue.Type Type
             => _member.GetCorrespondingExpressionType();
 
+        public string ManagedMemberName { get; }
         public bool IsWritable { get; }
         public bool IsReadable { get; }
         public bool IsEnum { get; }
@@ -30,7 +31,8 @@ namespace Chroma.Commander
             }
 
             EnsureSupportedType(field);
-            
+
+            ManagedMemberName = field.Name;
             IsWritable = !field.IsInitOnly;
             IsReadable = true;
             IsEnum = field.FieldType.IsEnum;
@@ -47,7 +49,8 @@ namespace Chroma.Commander
             }
 
             EnsureSupportedType(property);
-            
+
+            ManagedMemberName = property.Name;
             IsWritable = property.CanWrite;
             IsReadable = property.CanRead;
             IsEnum = property.PropertyType.IsEnum;

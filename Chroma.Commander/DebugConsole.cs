@@ -25,7 +25,6 @@ namespace Chroma.Commander
             Visible
         }
 
-        private Window _window;
         private RenderTarget _target;
         private Vector2 _offset;
         private TrueTypeFont _ttf;
@@ -54,10 +53,10 @@ namespace Chroma.Commander
         public bool IsOpen => _state is not State.Hidden;
         public bool IsTransitioning => _state is State.SlidingDown or State.SlidingDown;
 
+        public event EventHandler<ConsoleVariableEventArgs> ConsoleVariableChanged;
+
         public DebugConsole(Window window, int maxLines = 20)
         {
-            _window = window;
-
             LoadFont();
 
             InputLineHeight = _ttf.Height;

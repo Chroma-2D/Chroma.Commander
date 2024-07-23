@@ -4,13 +4,15 @@ namespace Chroma.Commander
 {
     public class ConsoleVariableInfo
     {
-        public string Name { get; }
+        public string ConVarName { get; }
+        public string ManagedMemberName { get; }
         public string Description { get; }
         public ExpressionValue.Type Type { get; }
 
-        internal ConsoleVariableInfo(string name, string description, ExpressionValue.Type type)
+        internal ConsoleVariableInfo(string conVarName, string managedMemberName, string description, ExpressionValue.Type type)
         {
-            Name = name;
+            ConVarName = conVarName;
+            ManagedMemberName = managedMemberName;
             Description = description;
             Type = type;
         }

@@ -57,21 +57,42 @@ namespace Chroma.Commander
             var tgt = _conVarRegistry.GetConVar(name);
             var rhs = Visit(asgn.Right);
 
+            object oldValue = null;
+            object newValue = null;
+            
             switch (rhs.ValueType)
             {
                 case ExpressionValue.Type.Boolean:
+                    oldValue = tgt.GetBoolean();
+                    newValue = rhs.Boolean;
                     tgt.Set(rhs.Boolean);
                     break;
-                
+
                 case ExpressionValue.Type.String:
+                    oldValue = tgt.GetString();
+                    newValue = rhs.String;
                     tgt.Set(rhs.String);
                     break;
-                
+
                 case ExpressionValue.Type.Number:
+                    oldValue = tgt.GetNumber();
+                    newValue = rhs.Number;
                     tgt.Set(rhs.Number);
                     break;
-                    
+
                 default: throw new ExpressionException($"Unexpected right-hand side operand type '{rhs.ValueType}'.");
+            }
+
+            if (oldValue != newValue)
+            {
+                ConsoleVariableChanged?.Invoke(
+                    this,
+                    new ConsoleVariableEventArgs(
+                        new ConsoleVariableInfo(name, tgt.ManagedMemberName, tgt.Description, tgt.Type),
+                        oldValue,
+                        newValue
+                    )
+                );
             }
         }
 
@@ -79,12 +100,11 @@ namespace Chroma.Commander
         {
             var left = Visit(binOp.Left);
             var right = Visit(binOp.Right);
-            
+
             switch (binOp.Type)
             {
                 case BinOpNode.BinOp.Add:
                 {
-                    
                     if (left.ValueType == ExpressionValue.Type.Number
                         && right.ValueType == ExpressionValue.Type.Number)
                     {
@@ -149,7 +169,7 @@ namespace Chroma.Commander
 
                     return new(left.Number * right.Number);
                 }
-                
+
                 default: throw new ExpressionException($"Invalid binary operation type '{binOp.Type}'.");
             }
         }
@@ -173,7 +193,7 @@ namespace Chroma.Commander
 
             throw new ExpressionException($"Unexpected variable type '{conVar.Type}'.");
         }
-        
+
         private void Visit(InvocationNode inv)
         {
             if (_commandRegistry.Exists(inv.Target))
@@ -188,7 +208,7 @@ namespace Chroma.Commander
             else
             {
                 throw new EntityNotFoundException(
-                    inv.Target, 
+                    inv.Target,
                     $"Command '{inv.Target}' does not exist.");
             }
         }
@@ -226,7 +246,7 @@ namespace Chroma.Commander
         {
             var sb = new StringBuilder();
             var cv = _conVarRegistry.GetConVar(tq.ConVarReference.Identifier);
-            
+
             sb.Append(cv.Type.ToString().ToLower());
             sb.Append(" | ");
 
@@ -243,10 +263,10 @@ namespace Chroma.Commander
                 sb.Append(" | ");
                 sb.Append(cv.ClrTypeFullName);
             }
-            
+
             Print(sb.ToString());
         }
-        
+
         private ExpressionValue Visit(StringNode str)
         {
             return new(str.Value);
