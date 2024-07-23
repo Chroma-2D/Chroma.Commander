@@ -256,7 +256,7 @@ namespace Chroma.Commander
                 return;
 
             _scrollBuffer.ScrollToEnd();
-            Print(input);
+            Print($"> {input}");
 
             try
             {
