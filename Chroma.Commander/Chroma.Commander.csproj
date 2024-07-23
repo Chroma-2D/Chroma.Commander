@@ -10,8 +10,8 @@
 
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageId>Chroma.Commander</PackageId>
-        <Version>1.0.1</Version>
-        <Authors>Ciastex</Authors>
+        <Version>1.1.0</Version>
+        <Authors>vddCore</Authors>
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>https://github.com/Chroma-2D/Chroma.Commander</RepositoryUrl>
         <PackageIcon>nugeticon.png</PackageIcon>
@@ -40,6 +40,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Chroma" Version="0.56.0" />
+      <PackageReference Include="Chroma" Version="0.64.0" />
     </ItemGroup>
 </Project>

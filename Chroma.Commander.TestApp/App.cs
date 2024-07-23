@@ -9,6 +9,8 @@ using Chroma.Input;
 
 namespace Chroma.Commander.TestApp
 {
+    using Chroma.ContentManagement;
+
     public class App : Game
     {
         private CustomBackgroundDebugConsole _console;
@@ -100,12 +102,12 @@ namespace Chroma.Commander.TestApp
             console.Print("Yay!");
         }
 
-        protected override void LoadContent()
+        protected override void Initialize(IContentProvider content)
         {
-            _consolebg = Content.Load<Texture>("console_bg.jpg");
+            _consolebg = content.Load<Texture>("console_bg.jpg");
             _console = new CustomBackgroundDebugConsole(Window, _consolebg);
             
-            _appbackdrop = Content.Load<Texture>("backdrop.jpg");
+            _appbackdrop = content.Load<Texture>("backdrop.jpg");
             _appbackdrop.VirtualResolution = Window.Size;
             _console.RegisterStaticEntities();
             _console.RegisterInstanceEntities(this);

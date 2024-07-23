@@ -114,15 +114,15 @@ namespace Chroma.Commander
             if (_state == State.Hidden)
                 return;
 
-            context.RenderTo(_target, () =>
+            context.RenderTo(_target, (c, t) =>
             {
-                context.Clear(Color.Transparent);
-                DrawBackdrop(context);
+                c.Clear(Color.Transparent);
+                DrawBackdrop(c);
                 
                 var scrollBufferWindow = _scrollBuffer.GetWindow();
                 for (var i = 0; i < scrollBufferWindow.Count; i++)
                 {
-                    context.DrawString(
+                    c.DrawString(
                         _ttf,
                         scrollBufferWindow[i],
                         new(0, _ttf.Height * i),
@@ -130,10 +130,10 @@ namespace Chroma.Commander
                     );
                 }
 
-                _inputLine.Draw(context);
+                _inputLine.Draw(c);
 
                 RenderSettings.LineThickness = BorderHeight;
-                context.Line(
+                c.Line(
                     new(0, _target.Height - BorderHeight / 2),
                     new(_target.Width, _target.Height - BorderHeight / 2),
                     Theme.BorderColor
